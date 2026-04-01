@@ -1,5 +1,6 @@
 import Hero from "@/app/components/hero";
 import PromoBanner from "./components/promo-banner";
+import FeaturedProducts from "./components/featured-products";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
         width : 800,
         height : 400 
       }} />
+      <FeaturedProducts />
     </>
   );
 }

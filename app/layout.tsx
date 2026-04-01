@@ -64,7 +64,7 @@ export default function RootLayout({
               {/* Logo */}
               <div className="flex items-center gap-2">
                 <Image
-                  src="Vercel_Symbol_0.svg"
+                  src="/Vercel_Symbol_0.svg"
                   height={45}
                   width={45}
                   alt="Vercel Logo"
