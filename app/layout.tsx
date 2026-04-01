@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -34,7 +35,8 @@ export default function RootLayout({
             <div className="flex h-16 items-center justify-between">
               {/* Logo */}
               <div className="flex items-center gap-2">
-                <span className="text-lg font-bold">Vercel Swag Store</span>
+                <Image src="Vercel_Symbol_0.svg" height={45} width={45} alt="Vercel Logo"  />
+                <span className="text-xl font-bold text-gray-900">Vercel Swag Store</span>
               </div>
               {/* Navigation */}
               <nav className="flex gap-6">
@@ -57,7 +59,7 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <footer className="border-t bg-white">
           <div className="mx-auto max-w-7xl px-4">
-            <div className="flex h-14 max-h-14 items-center text-sm text-gray-600">
+            <div className="flex h-14 max-h-14 items-center justify-center text-sm text-gray-600">
               © {new Date().getFullYear()} Vercel Swag Store
             </div>
           </div>
