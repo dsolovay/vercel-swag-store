@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getFeaturedProducts } from "@/app/lib/data";
+import { getProducts } from "@/app/lib/data";
 
 async function FeaturedProducts() {
-    const products = await getFeaturedProducts();
+  const products = await getProducts(/* featured */ true);
 
-    return (
-        <div>
-            <h2>Featured Products</h2>
-            <ul>
-                {products.data.map((product) => (
-                    <li key={product.id}>{product.name}</li>
-                ))}
-            </ul>
-        </div>
-    );
+  return (
+    <div>
+      <h2>Featured Products</h2>
+      <ul>
+        {products.data.map((product) => (
+          <li key={product.id}>{product.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 export const metadata: Metadata = {
   title: "Search",
@@ -30,7 +30,7 @@ export default function Search() {
       <h1>Search Page</h1>
       <p>This is the search page.</p>
       <Suspense fallback={<p>Loading search results...</p>}>
-         <FeaturedProducts />
+        <FeaturedProducts />
       </Suspense>
     </div>
   );
