@@ -4,7 +4,6 @@ import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
-import { cacheLife } from "next/cache";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,25 +18,25 @@ const geistMono = Geist_Mono({
 const titleTemplate = {
   default: "Vercel Swag Store",
   template: "%s | Vercel Swag Store",
-}
-const description = "Vercel Swag Store certification exercise for Dan Solovay"
+};
+const description = "Vercel Swag Store certification exercise for Dan Solovay";
 
 async function Footer() {
   "use cache";
   const year = new Date().getFullYear();
   return (
     <footer className="border-t bg-white">
-          <div className="mx-auto max-w-7xl px-4">
-            <div className="flex h-14 max-h-14 items-center justify-center text-sm text-gray-600">
-              © {year} Vercel Swag Store
-            </div>
-          </div>
-        </footer>
+      <div className="mx-auto max-w-7xl px-4">
+        <div className="flex h-14 max-h-14 items-center justify-center text-sm text-gray-600">
+          © {year} Vercel Swag Store
+        </div>
+      </div>
+    </footer>
   );
 }
 
 export const metadata: Metadata = {
-  title:titleTemplate,
+  title: titleTemplate,
   description: description,
   openGraph: {
     title: titleTemplate,
@@ -96,7 +95,6 @@ export default function RootLayout({
         <Suspense fallback={<div>Loading footer...</div>}>
           <Footer />
         </Suspense>
-        
       </body>
     </html>
   );
