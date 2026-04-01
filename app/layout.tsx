@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -29,12 +30,38 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <header className="bg-white border-b">
-          <div className="mx-auto max-w-7x1 px-4 py-4">
-            <h1 className="text-xl font-semibold text-gray-900">Vercel Swag Store</h1>
+          <div className="mx-auto max-w-7xl px-4">
+            <div className="flex h-16 items-center justify-between">
+              {/* Logo */}
+              <div className="flex items-center gap-2">
+                <span className="text-lg font-bold">Vercel Swag Store</span>
+              </div>
+              {/* Navigation */}
+              <nav className="flex gap-6">
+                <Link
+                  href="/"
+                  className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                >
+                  Home
+                </Link>
+                <Link
+                  href="/search"
+                  className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                >
+                  Search
+                </Link>
+              </nav>
+            </div>
           </div>
         </header>
-        <main>{children}</main>
-        <footer>Copyright notice</footer>
+        <main className="flex-1">{children}</main>
+        <footer className="border-t bg-white">
+          <div className="mx-auto max-w-7xl px-4">
+            <div className="flex h-14 max-h-14 items-center text-sm text-gray-600">
+              © {new Date().getFullYear()} Vercel Swag Store
+            </div>
+          </div>
+        </footer>
       </body>
     </html>
   );
