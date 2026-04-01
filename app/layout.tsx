@@ -27,7 +27,15 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <header className="bg-white border-b">
+          <div className="mx-auto max-w-7x1 px-4 py-4">
+            <h1 className="text-xl font-semibold text-gray-900">Vercel Swag Store</h1>
+          </div>
+        </header>
+        <main>{children}</main>
+        <footer>Copyright notice</footer>
+      </body>
     </html>
   );
 }
