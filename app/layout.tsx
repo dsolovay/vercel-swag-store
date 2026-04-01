@@ -3,6 +3,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Suspense } from "react";
+import { cacheLife } from "next/cache";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,6 +21,20 @@ const titleTemplate = {
   template: "%s | Vercel Swag Store",
 }
 const description = "Vercel Swag Store certification exercise for Dan Solovay"
+
+async function Footer() {
+  "use cache";
+  const year = new Date().getFullYear();
+  return (
+    <footer className="border-t bg-white">
+          <div className="mx-auto max-w-7xl px-4">
+            <div className="flex h-14 max-h-14 items-center justify-center text-sm text-gray-600">
+              © {year} Vercel Swag Store
+            </div>
+          </div>
+        </footer>
+  );
+}
 
 export const metadata: Metadata = {
   title:titleTemplate,
@@ -77,13 +93,10 @@ export default function RootLayout({
           </div>
         </header>
         <main className="flex-1">{children}</main>
-        <footer className="border-t bg-white">
-          <div className="mx-auto max-w-7xl px-4">
-            <div className="flex h-14 max-h-14 items-center justify-center text-sm text-gray-600">
-              © {new Date().getFullYear()} Vercel Swag Store
-            </div>
-          </div>
-        </footer>
+        <Suspense fallback={<div>Loading footer...</div>}>
+          <Footer />
+        </Suspense>
+        
       </body>
     </html>
   );
