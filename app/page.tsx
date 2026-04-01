@@ -4,7 +4,7 @@ import FeaturedProducts from "./components/featured-products";
 
 export default function Home() {
   return (
-    <>
+    <div className="my-6">
       <PromoBanner />
       <Hero title="Welcome to the Vercel Swag Store"
         description="Discover our exclusive collection of Vercel swag items, from stylish apparel to must-have accessories. Shop now and show off your Vercel pride!"
@@ -16,6 +16,6 @@ export default function Home() {
         height : 400 
       }} />
       <FeaturedProducts />
-    </>
+    </div>
   );
 }
