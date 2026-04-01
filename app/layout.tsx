@@ -65,10 +65,13 @@ export default function RootLayout({
               <div className="flex items-center gap-2">
                 <Image
                   src="/Vercel_Symbol_0.svg"
-                  height={45}
-                  width={45}
                   alt="Vercel Logo"
+                  width={1155}
+                  height={1000}
+                  className="h-10! w-auto"
                 />
+
+                 
                 <span className="text-xl font-bold text-gray-900">
                   Vercel Swag Store
                 </span>
