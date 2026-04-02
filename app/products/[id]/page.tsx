@@ -4,6 +4,34 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Price } from "@/app/components/Price";
 import { AddToCartButton } from "@/app/components/add-to-cart";
+import { Hedvig_Letters_Sans } from "next/font/google";
+
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const {id} = await params;
+  const productDetails = await getProductDetails(id);
+  if (!productDetails.success || !productDetails.data) {
+    return {
+      title: "Product Not Found",
+      openGraph: {
+        title: "Product Not Found",       
+      },
+    };
+  }
+  return {
+    title: productDetails.data.name,
+    description: productDetails.data.description,
+    openGraph: {
+      title: productDetails.data.name,
+      description: productDetails.data.description,
+       images: productDetails.data.images.map((img) => ({
+          url: img,
+          alt: productDetails.data.name,
+          width: 400,
+          height: 400,
+        })),
+    },
+  };
+} 
 
 async function StockInfo({ productId }: { productId: string }) {
   const availabilityInfo = await getProductAvailability(productId);
