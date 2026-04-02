@@ -7,7 +7,6 @@ import { AddToCartButton } from "@/app/components/add-to-cart";
 
 async function StockInfo({ productId }: { productId: string }) {
   const availabilityInfo = await getProductAvailability(productId);
-  console.log("Availability info for product", productId, availabilityInfo);
   const stock = availabilityInfo.data.stock;
   return (
     <>
@@ -20,12 +19,13 @@ async function StockInfo({ productId }: { productId: string }) {
 }
 
 
-async function ProductDetail({
-  idPromise,
+export default async function ProductDetailPage({
+  params,
 }: {
-  idPromise: Promise<{ id: string }>;
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = await idPromise;
+  
+  const { id } = await params;
   const productResponse = await getProductDetails(id);
   if (!productResponse.success || !productResponse.data) {
     notFound();
@@ -40,19 +40,7 @@ async function ProductDetail({
         <StockInfo productId={id} />
       </Suspense>
     </div>
-  );
-}
-
-export default async function ProductDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  return (
-    <Suspense fallback={<p>Loading product details...</p>}>
-      <ProductDetail idPromise={params} />
-    </Suspense>
-  );
+  );    
 }
 
 export async function generateStaticParams() {
