@@ -90,6 +90,12 @@ export default function RootLayout({
                 >
                   Search
                 </Link>
+                 <Link
+                  href="/cart"
+                  className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                >
+                  Cart
+                </Link>
               </nav>
             </div>
           </div>
