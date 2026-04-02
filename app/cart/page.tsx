@@ -62,6 +62,12 @@ export default async function CartPage() {
             ))}
           </tbody>
         </table>
+        <div className="flex justify-end mt-6">
+          <div className="text-xl font-bold">
+            Total:{" "}
+            <Price price={cart.data.subtotal} currency={cart.data.currency} />
+          </div>
+        </div>
       </div>
 
     </div>
