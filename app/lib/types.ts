@@ -69,14 +69,17 @@ type AmountInfo = {
 export type Cart = {
   token: string;
   items: CartItem[];
- } & DateInfo & AmountInfo;
+  totalItems: number;
+  subtotal: number;
+  currency: string;
+ } & DateInfo;
 
 export type CartItem = {
   productId: string;
   quantity: number;
   addedAt: string;
   product: Product;
-  totalItems: number; 
+  lineTotal: number; 
 } & DateInfo & AmountInfo;
 
 export type PromotionResponse = ApiResponse<Promotion>;

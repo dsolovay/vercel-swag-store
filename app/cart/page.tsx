@@ -1,42 +1,69 @@
 import { cookies } from "next/headers";
-import { createCart } from "../lib/data";
-
-async function setCartCookie(token: string) {
-  "use server";
-  const cookieStore = await cookies();
-  cookieStore.set("cart", token);
-}
+import { getCart } from "../lib/data";
+import Image from "next/image";
+import { Price } from "../components/Price";
 
 export default async function CartPage() {
   const cookieStore = await cookies();
-  let cartToken = cookieStore.get("cart")?.value;
-  const isNewToken = !cartToken;
-  if (!cartToken) {
-    const cartResponse = await createCart();
-    if (cartResponse.success && cartResponse.data) {
-      cartToken = cartResponse.data.token;
-    }
+  const cartToken = cookieStore.get("cart")?.value;
+  const cart = cartToken ? await getCart(cartToken) : null;
+
+  if (!cart) {
+    return (
+      <div className="my-6">
+        <h1 className="text-3xl font-bold mb-4">Your Cart</h1>
+        <p>Shopping cart is empty..</p>
+      </div>
+    );
   }
 
-  const setCartCookieWithToken = setCartCookie.bind(null, cartToken ?? "");
   return (
     <div className="my-6">
       <h1 className="text-3xl font-bold mb-4">Your Cart</h1>
-      <p>Your cart ID is: {cartToken ?? "No cart token found"}</p>
-      <p>{isNewToken ? "This is a new token." : "This is an existing token."}</p>
-      {isNewToken && (
-      <form action={setCartCookieWithToken} className="mt-4">
-         {/*
-       Learning: A cookie can only be set by a route hanbdler or a server action, so we need to have a form to persist this.
-       This will get replaced later on by a legit form action, e.g. when adding a produc to a cart.
-       */}
-        <button
-          type="submit"
-          className="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-500"
-        >
-          Persist Token
-        </button>
-      </form>) }
+      <div className="m-2 md:m-4">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b text-left">
+              <th className="py-3 pr-4 font-semibold">Product</th>
+              <th className="py-3 px-4 font-semibold text-right">Quantity</th>
+              <th className="py-3 px-4 font-semibold text-right">Price</th>
+              <th className="py-3 pl-4 font-semibold text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {cart.data.items.map((item) => (
+              <tr key={item.productId} className="border-b last:border-0">
+                <td className="py-4 pr-4">
+                  <div className="flex items-center gap-4">
+                    <Image
+                      src={item.product.images[0]}
+                      alt={item.product.name}
+                      width={50}
+                      height={50}
+                      className="h-12.5 w-12.5 rounded-sm object-cover"
+                    />
+                    <span>{item.product.name}</span>
+                  </div>
+                </td>
+                <td className="py-4 px-4 text-right">{item.quantity}</td>
+                <td className="py-4 px-4 text-right">
+                  <Price
+                    price={item.product.price}
+                    currency={item.product.currency}
+                  />
+                </td>
+                <td className="py-4 pl-4 text-right">
+                  <Price
+                    price={item.product.price * item.quantity}
+                    currency={item.product.currency}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
     </div>
   );
 }

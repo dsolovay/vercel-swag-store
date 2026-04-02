@@ -64,3 +64,11 @@ export function addToCart(data: { productId: string; quantity: number; cartToken
     });
 }
 
+export function getCart(cartToken: string): Promise<ApiResponse<Cart>> {
+  return doFetch('/cart', {
+    headers: {
+      "x-cart-token": cartToken,
+    }
+  });
+}
+

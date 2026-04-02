@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { addToCart, createCart } from "../lib/data";
+import { addToCart, createCart } from "./data";
 
 export async function addProductToCart(productId: string, formData: FormData) {
   const cartToken = await getCartToken();

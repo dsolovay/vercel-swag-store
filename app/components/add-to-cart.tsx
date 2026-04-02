@@ -1,6 +1,6 @@
 "use client";
 
-import { addProductToCart } from "../lib/cart";
+import { addProductToCart } from "../lib/cart-server-actions";
 
 export function AddToCartButton({
   productId,
