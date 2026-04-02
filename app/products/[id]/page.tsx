@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Price } from "@/app/components/Price";
 import { AddToCartButton } from "@/app/components/add-to-cart";
-import { Hedvig_Letters_Sans } from "next/font/google";
+
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const {id} = await params;
