@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { getCart } from "../lib/data";
 import Image from "next/image";
 import { Price } from "../components/Price";
+import { Trash, Plus, Minus } from "lucide-react";
 
 export default async function CartPage() {
   const cookieStore = await cookies();
@@ -28,6 +29,7 @@ export default async function CartPage() {
               <th className="py-3 px-4 font-semibold text-right">Quantity</th>
               <th className="py-3 px-4 font-semibold text-right">Price</th>
               <th className="py-3 pl-4 font-semibold text-right">Total</th>
+              <th className="py-3 pl-6" />
             </tr>
           </thead>
           <tbody>
@@ -45,7 +47,13 @@ export default async function CartPage() {
                     <span>{item.product.name}</span>
                   </div>
                 </td>
-                <td className="py-4 px-4 text-right">{item.quantity}</td>
+                <td className="py-4 px-4">
+                  <div className="flex items-center justify-end gap-2">
+                    <Minus size={14} className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer" />
+                    <span className="w-6 text-center tabular-nums">{item.quantity}</span>
+                    <Plus size={14} className="text-gray-400 hover:text-green-500 transition-colors cursor-pointer" />
+                  </div>
+                </td>
                 <td className="py-4 px-4 text-right">
                   <Price
                     price={item.product.price}
@@ -57,6 +65,9 @@ export default async function CartPage() {
                     price={item.product.price * item.quantity}
                     currency={item.product.currency}
                   />
+                </td>
+                <td className="py-4 pl-6 text-gray-400 hover:text-red-500 transition-colors">
+                  <Trash size={16} />
                 </td>
               </tr>
             ))}

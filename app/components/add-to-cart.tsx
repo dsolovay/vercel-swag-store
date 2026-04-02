@@ -27,6 +27,7 @@ export function AddToCartButton({
           Add to Cart
         </button>
       </form>
+      {/* TODO: Show confirmation or error. */}
     </div>
   );
 }
