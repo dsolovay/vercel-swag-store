@@ -2,22 +2,11 @@ import { getProducts } from "@/app/lib/data";
 import { Product } from "@/app/lib/types";
 import Image from "next/image";
 import Link from "next/link";
-
-function Price({ price, currency }: { price: number; currency: string }) {
-  const decimalPrice = price / 100; // Assuming price is in cents
-  if (currency === "USD") {
-    return <span>${decimalPrice.toFixed(2)}</span>;
-  }
-  return (
-    <span>
-      {decimalPrice.toFixed(2)} {currency}
-    </span>
-  );
-}
+import { Price } from "./Price";
 
 function ProductCard({ product }: { product: Product }) {
   return (
-    <Link href={`/products/${product.slug}`} className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+    <Link href={`/products/${product.id}`} className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
     <div className="flex flex-col items-center">
       {product.images && product.images.length > 0 && (
         <Image

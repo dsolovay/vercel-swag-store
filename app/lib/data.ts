@@ -1,24 +1,35 @@
 "use cache";
-import { ProductResponse, PromotionResponse } from "./types";
+import { cache } from "react";
+import { ProductDetailsResponse, ProductsResponse, PromotionResponse, AvailabilityInfo, ApiResponse } from "./types";
 
 import "server-only";
+import { cacheLife } from "next/cache";
+const basePath = (process.env.API_BASE_URL ?? "").replace(/\/+$/, ""); // Remove trailing slashes
+// TODO - add error if not set
 
-
-
-export async function getProducts(featured?: boolean):Promise<ProductResponse> {
-  const res = await fetch(`${process.env.API_BASE_URL}/products${featured ? '?featured=true' : ''}`, {
+function doFetch<T>(path: string): Promise<T> {
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return fetch(`${basePath}${cleanPath}`, {
     headers: {
       "x-vercel-protection-bypass": process.env.VERCEL_PROTECTION_BYPASS ?? '',
     },
-  });
-  return res.json();
+  }).then(res => res.json());
+}
+
+
+export async function getProducts(featured?: boolean):Promise<ProductsResponse> {
+  return doFetch(`/products${featured ? '?featured=true' : ''}`); 
 }
 
 export async function getActivePromotion():Promise<PromotionResponse> {
-  const res = await fetch(`${process.env.API_BASE_URL}/promotions?active=true`, {
-    headers: {
-      "x-vercel-protection-bypass": process.env.VERCEL_PROTECTION_BYPASS ?? '',
-    },
-  });
-  return res.json();
+  return doFetch(`/promotions?active=true`);
+}
+ 
+export async function getProductDetails(id: string):Promise<ProductDetailsResponse> {
+  return doFetch(`/products/${id}`);
+}
+
+export async function getProductAvailability(id: string):Promise<ApiResponse<AvailabilityInfo>> {
+  cacheLife("seconds");
+  return doFetch(`/products/${id}/stock`);
 }

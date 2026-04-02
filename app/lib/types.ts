@@ -32,10 +32,12 @@ export type Pagination = {
   hasPreviousPage: boolean;
 };
 
-export type ProductResponse = ApiResponse<
+export type ProductsResponse = ApiResponse<
   Product[],
   { pagination: Pagination }
 >;
+
+export type ProductDetailsResponse = ApiResponse<Product>;
 
 export type Promotion = {
   id: string;
@@ -47,5 +49,12 @@ export type Promotion = {
   validUntil: string;
   active: boolean;
 };
+
+export type AvailabilityInfo = {
+  productId: string;
+  stock: number;
+  inStock: boolean;
+  lowStock: boolean;
+}
 
 export type PromotionResponse = ApiResponse<Promotion>;
