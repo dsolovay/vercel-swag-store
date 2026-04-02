@@ -67,7 +67,7 @@ type AmountInfo = {
 }
 
 export type Cart = {
-  toeken: string;
+  token: string;
   items: CartItem[];
  } & DateInfo & AmountInfo;
 
