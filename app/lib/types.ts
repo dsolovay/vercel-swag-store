@@ -57,4 +57,26 @@ export type AvailabilityInfo = {
   lowStock: boolean;
 }
 
+type DateInfo = {
+  createdAt: string;
+  updatedAt: string;
+}
+type AmountInfo = {
+  amount: number;
+  currency: string;
+}
+
+export type Cart = {
+  toeken: string;
+  items: CartItem[];
+ } & DateInfo & AmountInfo;
+
+export type CartItem = {
+  productId: string;
+  quantity: number;
+  addedAt: string;
+  product: Product;
+  totalItems: number; 
+} & DateInfo & AmountInfo;
+
 export type PromotionResponse = ApiResponse<Promotion>;
