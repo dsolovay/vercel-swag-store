@@ -72,3 +72,27 @@ export function getCart(cartToken: string): Promise<ApiResponse<Cart>> {
   });
 }
 
+// TODO handle errors
+export function deleteCartLine(data: { productId: string; cartToken: string }): Promise<ApiResponse<Cart>> {
+  return doFetch(`/cart/${data.productId}`,
+    {
+      method: "DELETE",
+      headers: {
+        "x-cart-token": data.cartToken,
+      }
+    });
+}
+
+
+export function updateQuantity(data: { productId: string; quantity: number; cartToken: string }): Promise<ApiResponse<Cart>> {
+  return doFetch(`/cart/${data.productId}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify({ "quantity": data.quantity }),
+      headers: {
+        "x-cart-token": data.cartToken,
+      }
+    });
+}
+
+
