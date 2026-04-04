@@ -2,11 +2,18 @@
 
 import { cookies } from "next/headers";
 import { addToCart, createCart, deleteCartLine, updateQuantity } from "./data";
+import { ServerActionResponse } from "./state";
 
-export async function addProductToCart(productId: string, formData: FormData) {
+export async function addProductToCart(productId: string, prevState: ServerActionResponse, formData: FormData): Promise<ServerActionResponse>    {
   const cartToken = await getCartToken();
   const quantity = Number(formData.get("quantity"));
-  await addToCart({"productId": productId, "quantity": quantity, "cartToken": cartToken});
+  try {
+    await addToCart({"productId": productId, "quantity": quantity, "cartToken": cartToken});
+    return { state: "success" };
+  } catch (error) {
+    console.error("Error adding product to cart:", error);
+    return { state: "error" };
+  }
 }
 // TODO naming convetion to make server functions easier to identify? E.g. prefix with "server" or "action" or something like that.
 export async function deleteProductFromCart(productId: string) {

@@ -83,3 +83,5 @@ export type CartItem = {
 } & DateInfo & AmountInfo;
 
 export type PromotionResponse = ApiResponse<Promotion>;
+
+
