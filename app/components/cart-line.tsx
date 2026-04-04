@@ -2,7 +2,7 @@
 
 import { Trash, Plus, Minus } from "lucide-react";
 import Image from "next/image";
-import { Cart } from "@/app/lib/types";
+import { Cart, CartItem } from "@/app/lib/types";
 import { Price } from "@/app/components/Price";
 import {
   deleteProductFromCart,
@@ -10,6 +10,26 @@ import {
 } from "../lib/cart-server-actions";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
+function ImageAndDescription (item: CartItem) {
+    return (
+        <div className="flex items-center gap-4">
+          <Link
+            className="flex items-center gap-4"
+            href={`/products/${item.product.id}`}
+          >
+            <Image
+              src={item.product.images[0]}
+              alt={item.product.name}
+              width={50}
+              height={50}
+              className="h-12.5 w-12.5 rounded-sm object-cover"
+            />
+            <span>{item.product.name}</span>
+          </Link>
+        </div>
+    )
+  }
 
 export function CartLine({ item }: { item: Cart["items"][number] }) {
   const router = useRouter();
@@ -30,36 +50,28 @@ export function CartLine({ item }: { item: Cart["items"][number] }) {
     router.refresh();
   }
 
+  
   return (
-    <tr key={item.productId} className="border-b last:border-0">
-      <td className="py-4 pr-4">
-        
-          <Link className="flex items-center gap-4" href={`/products/${item.product.id}`}>  
-            <Image
-              src={item.product.images[0]}
-              alt={item.product.name}
-              width={50}
-              height={50}
-              className="h-12.5 w-12.5 rounded-sm object-cover"
-            />          
-            <span>{item.product.name}</span>
-          </Link>
+    {/* TODO: On mobile, show picture in one column, have description and controls in another column. Hide column headings on mmobile. */}
+    <>
+    <tr key={`mobile-${item.productId}`} className="sm:hidden">
+      <td colSpan={5} className="py-4">
+        <ImageAndDescription {...item} />
+        <div>
+<QuantityControl decrement={decrement} item={item} increment={increment} />
+        </div>
         
       </td>
-      <td className="py-4 px-4">
-        <div className="flex items-center justify-end gap-2">
-          <Minus
-            size={14}
-            className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-            onClick={decrement}
-          />
-          <span className="w-6 text-center tabular-nums">{item.quantity}</span>
-          <Plus
-            size={14}
-            className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-            onClick={increment}
-          />
-        </div>
+      
+
+    </tr>
+     <tr key={item.productId} className="hidden sm:table-row border-b last:border-0">  
+      
+      <td className="py-4 pr-4">
+        <ImageAndDescription {...item} />
+      </td>
+      <td className=" py-4 px-4">
+        <QuantityControl decrement={decrement} item={item} increment={increment} />
       </td>
       <td className="py-4 px-4 text-right">
         <Price price={item.product.price} currency={item.product.currency} />
@@ -81,5 +93,20 @@ export function CartLine({ item }: { item: Cart["items"][number] }) {
         </button>
       </td>
     </tr>
+    </>
   );
 }
+function QuantityControl({ decrement, item, increment }: { decrement: () => Promise<void>; item: CartItem; increment: () => Promise<void> }) {
+  return <div className="flex items-center gap-2">
+    <Minus
+      size={14}
+      className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+      onClick={decrement} />
+    <span className="w-6 text-center tabular-nums">{item.quantity}</span>
+    <Plus
+      size={14}
+      className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+      onClick={increment} />
+  </div>;
+}
+
