@@ -7,7 +7,7 @@ export default async function CartPage() {
   const cartToken = cookieStore.get("cart")?.value;
   const cart = cartToken ? await getCart(cartToken) : null;
 
-  if (!cart) {
+  if (!cart || cart.data.items.length === 0) {
     return (
       <div className="my-6">
         <h1 className="text-3xl font-bold mb-4">Your Cart</h1>
