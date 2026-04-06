@@ -50,63 +50,82 @@ export function CartLine({ item }: { item: Cart["items"][number] }) {
     router.refresh();
   }
 
-  
+  {
+    /* TODO: On mobile, show picture in one column, have description and controls in another column. Hide column headings on mmobile. */
+  }
   return (
-    {/* TODO: On mobile, show picture in one column, have description and controls in another column. Hide column headings on mmobile. */}
     <>
-    <tr key={`mobile-${item.productId}`} className="sm:hidden">
-      <td colSpan={5} className="py-4">
-        <ImageAndDescription {...item} />
-        <div>
-<QuantityControl decrement={decrement} item={item} increment={increment} />
-        </div>
-        
-      </td>
-      
-
-    </tr>
-     <tr key={item.productId} className="hidden sm:table-row border-b last:border-0">  
-      
-      <td className="py-4 pr-4">
-        <ImageAndDescription {...item} />
-      </td>
-      <td className=" py-4 px-4">
-        <QuantityControl decrement={decrement} item={item} increment={increment} />
-      </td>
-      <td className="py-4 px-4 text-right">
-        <Price price={item.product.price} currency={item.product.currency} />
-      </td>
-      <td className="py-4 pl-4 text-right">
-        <Price
-          price={item.product.price * item.quantity}
-          currency={item.product.currency}
-        />
-      </td>
-      <td className="py-4 pl-6 text-right">
-        <button
-          type="button"
-          onClick={handleDelete}
-          className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-          aria-label={`Remove ${item.product.name} from cart`}
-        >
-          <Trash size={16} />
-        </button>
-      </td>
-    </tr>
+      <tr key={`mobile-${item.productId}`} className="sm:hidden">
+        <td colSpan={5} className="py-4 px-4">
+          <ImageAndDescription {...item} />
+          <div>
+            <QuantityControl
+              decrement={decrement}
+              item={item}
+              increment={increment}
+            />
+          </div>
+        </td>
+      </tr>
+      <tr
+        key={item.productId}
+        className="hidden sm:table-row border-b last:border-0"
+      >
+        <td className="py-4 pr-4 col-span-1">
+          <ImageAndDescription {...item} />
+        </td>
+        <td className=" py-4 px-4">
+          <QuantityControl
+            decrement={decrement}
+            item={item}
+            increment={increment}
+          />
+        </td>
+        <td className="py-4 px-4 text-right">
+          <Price price={item.product.price} currency={item.product.currency} />
+        </td>
+        <td className="py-4 pl-4 text-right">
+          <Price
+            price={item.product.price * item.quantity}
+            currency={item.product.currency}
+          />
+        </td>
+        <td className="py-4 pl-6 text-right">
+          <button
+            type="button"
+            onClick={handleDelete}
+            className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+            aria-label={`Remove ${item.product.name} from cart`}
+          >
+            <Trash size={16} />
+          </button>
+        </td>
+      </tr>
     </>
   );
 }
-function QuantityControl({ decrement, item, increment }: { decrement: () => Promise<void>; item: CartItem; increment: () => Promise<void> }) {
-  return <div className="flex items-center gap-2">
-    <Minus
-      size={14}
-      className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-      onClick={decrement} />
-    <span className="w-6 text-center tabular-nums">{item.quantity}</span>
-    <Plus
-      size={14}
-      className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-      onClick={increment} />
-  </div>;
+function QuantityControl({
+  decrement,
+  item,
+  increment,
+}: {
+  decrement: () => Promise<void>;
+  item: CartItem;
+  increment: () => Promise<void>;
+}) {
+  return (
+    <div className="flex items-center gap-2 justify-end">
+      <Minus
+        size={14}
+        className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+        onClick={decrement}
+      />
+      <span className="w-6 text-center tabular-nums">{item.quantity}</span>
+      <Plus
+        size={14}
+        className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+        onClick={increment}
+      />
+    </div>
+  );
 }
-
