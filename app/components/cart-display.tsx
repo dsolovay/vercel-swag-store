@@ -10,11 +10,11 @@ export function CartDisplay(cart: { success: boolean; data: Cart; }) {
             <table className="w-full border-collapse">
                 <thead>
                     <tr className="border-b text-left">
-                        <th className="py-3 pr-4 font-semibold">Product</th>
-                        <th className="py-3 px-4 font-semibold text-right">Quantity</th>
-                        <th className="py-3 px-4 font-semibold text-right">Price</th>
-                        <th className="py-3 pl-4 font-semibold text-right">Total</th>
-                        <th className="py-3 pl-6" />
+                        <th className="hidden sm:table-cell py-3 pr-4 font-semibold">Product</th>
+                        <th className="hidden sm:table-cell py-3 px-4 font-semibold text-right">Quantity</th>
+                        <th className="hidden sm:table-cell py-3 px-4 font-semibold text-right">Price</th>
+                        <th className="hidden sm:table-cell py-3 pl-4 font-semibold text-right">Total</th>
+                        <th className="hidden sm:table-cell py-3 pl-6" />
                     </tr>
                 </thead>
                 <tbody>
