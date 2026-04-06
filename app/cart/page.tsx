@@ -11,7 +11,7 @@ export default async function CartPage() {
     return (
       <div className="my-6">
         <h1 className="text-3xl font-bold mb-4">Your Cart</h1>
-        <p>Shopping cart is empty..</p>
+        <p>Shopping cart is empty.</p>
       </div>
     );
   }

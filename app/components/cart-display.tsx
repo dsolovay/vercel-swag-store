@@ -23,7 +23,13 @@ export function CartDisplay(cart: { success: boolean; data: Cart; }) {
                     ))}
                 </tbody>
                 <tfoot>
-                    <tr className="border-t">
+                    <tr className="sm:hidden border-t">
+                        <td colSpan={5} className="py-4 pr-4 text-center font-bold">
+                            Subtotal:     <Price price={cart.data.subtotal} currency={cart.data.currency} />
+                        </td>
+                        
+                    </tr>
+                    <tr className="hidden sm:table-row border-t">
                         <td colSpan={3} className="py-4 pr-4 text-right font-bold">
                             Subtotal:
                         </td>

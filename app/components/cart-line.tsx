@@ -10,26 +10,46 @@ import {
 } from "../lib/cart-server-actions";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { on } from "events";
 
-function ImageAndDescription (item: CartItem) {
-    return (
-        <div className="flex items-center gap-4">
-          <Link
-            className="flex items-center gap-4"
-            href={`/products/${item.product.id}`}
-          >
-            <Image
-              src={item.product.images[0]}
-              alt={item.product.name}
-              width={50}
-              height={50}
-              className="h-12.5 w-12.5 rounded-sm object-cover"
-            />
-            <span>{item.product.name}</span>
-          </Link>
-        </div>
-    )
-  }
+function ImageAndDescription(item: CartItem) {
+  return (
+    <div className="flex items-center gap-4">
+      <Link
+        className="flex items-center gap-4"
+        href={`/products/${item.product.id}`}
+      >
+        <Image
+          src={item.product.images[0]}
+          alt={item.product.name}
+          width={50}
+          height={50}
+          className="h-12.5 w-12.5 rounded-sm object-cover"
+        />
+        <span>{item.product.name}</span>
+      </Link>
+    </div>
+  );
+}
+
+function RemoveButton({
+  onClick,
+  item,
+}: {
+  onClick: () => void;
+  item: CartItem;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+      aria-label={`Remove ${item.product.name} from cart`}
+    >
+      <Trash size={16} />
+    </button>
+  );
+}
 
 export function CartLine({ item }: { item: Cart["items"][number] }) {
   const router = useRouter();
@@ -55,18 +75,53 @@ export function CartLine({ item }: { item: Cart["items"][number] }) {
   }
   return (
     <>
+      {/* Mobile */}
       <tr key={`mobile-${item.productId}`} className="sm:hidden">
         <td colSpan={5} className="py-4 px-4">
           <ImageAndDescription {...item} />
-          <div>
-            <QuantityControl
-              decrement={decrement}
-              item={item}
-              increment={increment}
-            />
+          <div className="flex items-center gap-4 justify-start pl-14 mt-2">
+            <table className="table-fixed">
+              <tbody className="[&_td]:py-0.5">
+                <tr>
+                  <td className="w-24 text-sm text-gray-500 pr-3">Quantity:</td>
+                  <td className="w-24">
+                    <div className="flex justify-end">
+                      <QuantityControl decrement={decrement} item={item} increment={increment} />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="w-24 text-sm text-gray-500 pr-3">Price:</td>
+                  <td className="w-24 text-right tabular-nums">
+                    <Price
+                      price={item.product.price}
+                      currency={item.product.currency}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td className="w-24 text-sm text-gray-500 pr-3">Total:</td>
+                  <td className="w-24 text-right tabular-nums">
+                    <Price
+                      price={item.product.price * item.quantity}
+                      currency={item.product.currency}
+                    />{" "}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="w-24 text-sm text-gray-500 pr-3">Remove:</td>
+                  <td className="w-24">
+                    <div className="flex justify-end">
+                      <RemoveButton onClick={handleDelete} item={item} />
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </td>
       </tr>
+      {/* Desktop and tablet */}
       <tr
         key={item.productId}
         className="hidden sm:table-row border-b last:border-0"
@@ -91,14 +146,7 @@ export function CartLine({ item }: { item: Cart["items"][number] }) {
           />
         </td>
         <td className="py-4 pl-6 text-right">
-          <button
-            type="button"
-            onClick={handleDelete}
-            className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-            aria-label={`Remove ${item.product.name} from cart`}
-          >
-            <Trash size={16} />
-          </button>
+          <RemoveButton onClick={handleDelete} item={item} />
         </td>
       </tr>
     </>
