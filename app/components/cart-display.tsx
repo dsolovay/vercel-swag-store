@@ -2,7 +2,6 @@ import { Price } from "./Price";
 import { Cart } from "@/app/lib/types";
 import { CartLine } from "./cart-line";
 
-// TODO: Immprove mobile display. Possibly show image and deteails above price and quantity on mobile.
 export function CartDisplay(cart: { success: boolean; data: Cart; }) {
     return <div className="my-6">
         <h1 className="text-3xl font-bold mb-4">Your Cart</h1>
