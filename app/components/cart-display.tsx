@@ -30,17 +30,15 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
   const [error, setError] = useState(false);
   const [cart, setCart] = useState(cartProp.data);
   
-  const [optimisticCart, dispatch] = useOptimistic(
+  const [optimisticCart, optimisticDeleteRow] = useOptimistic(
     cart,
     (
       currentCart: Cart,
-      action: {
-        type: "increment" | "decrement" | "delete";
+      action: {      
         productId?: string;
       },
     ) => {
-      switch (action.type) {
-        case "delete": {
+      
           const exists = currentCart.items.find(
             (item) => item.productId === action.productId,
           );
@@ -55,54 +53,13 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
           );
           return newCart;
         }
-        case "increment": {
-          const exists = currentCart.items.find(
-            (item) => item.productId === action.productId,
-          );
-          if (!exists) return currentCart;
-          const newCart = CopyCart(currentCart);
-          newCart.items.find(
-            (item) => item.productId === action.productId,
-          )!.quantity += 1;
-          newCart.subtotal = newCart.items.reduce(
-            (acc, item) => acc + item.product.price * item.quantity,
-            0,
-          );
-          return newCart;
-        }
-        case "decrement": {
-          const exists = currentCart.items.find(
-            (item) => item.productId === action.productId,
-          );
-          if (!exists || exists.quantity <= 1) return currentCart;
-          const newCart = CopyCart(currentCart);
-          newCart.items.find(
-            (item) => item.productId === action.productId,
-          )!.quantity -= 1;
-          if (
-            newCart.items.find((item) => item.productId === action.productId)!
-              .quantity === 0
-          ) {
-            newCart.items = newCart.items.filter(
-              (item) => item.productId !== action.productId,
-            );
-          }
-          newCart.subtotal = newCart.items.reduce(
-            (acc, item) => acc + item.product.price * item.quantity,
-            0,
-          );
-          return newCart;
-        }
-        default:
-          return currentCart;
-      }
-    },
+    
   );
 
   function handleDelete(productId: string) {
     console.log("deleting", productId);
     startTransition(async () => {
-      dispatch({ type: "delete", productId });
+      optimisticDeleteRow({ productId });
       const response = await deleteProductFromCart(productId);
       if (!response.success) {
         setError(true);
