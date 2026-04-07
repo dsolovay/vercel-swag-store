@@ -2,9 +2,11 @@
 
 import { addProductToCart } from "../lib/cart-server-actions";
 import { useFormStatus } from "react-dom";
+import { useEffect } from "react";
 import { useActionState } from "react";
 import { InitialServerActionState } from "@/app/lib/state";
 import Link from "next/dist/client/link";
+import { useRouter } from "next/navigation";
 
 function SubmitButton({ stock }: { stock: number }) {
   const { pending } = useFormStatus();
@@ -19,14 +21,20 @@ function SubmitButton({ stock }: { stock: number }) {
   );
 }
  
-function Feedback({ state }: { state: { state: "idle" | "success" | "error" } }) {
+function Feedback({ state, router }: { state: { state: "idle" | "success" | "error" }, router: ReturnType<typeof useRouter> }) {
   const { pending } = useFormStatus();
+  useEffect(() => {
+    if (state.state === "success") {
+      router.refresh(); // Refresh to update cart quantity in header.
+    }
+  }, [state, router]);
+
   if (pending) { return null; } // Button shows adding status.
 
   if (state.state === "error") {
     return <p className="text-red-700 mt-2">Failed to add product to cart. Please try again.</p>;
   }
-  if (state.state === "success") {
+  if (state.state === "success") {   
     return (
       <p className=" mt-2">
         Product added. <Link className="text-blue-700 underline" href="/cart">View Cart</Link>.
@@ -46,6 +54,7 @@ export function AddToCartButton({
   const addToCartWithProduct = addProductToCart.bind(null, productId);
   
   const [state, formAction] = useActionState(addToCartWithProduct, InitialServerActionState);
+  const router = useRouter();
 
   return (
     <div>
@@ -61,8 +70,8 @@ export function AddToCartButton({
             </option>
           ))}
         </select>
-        <SubmitButton stock={stock} />
-        <Feedback state={state} />       
+        <SubmitButton stock={stock}  />
+        <Feedback state={state} router={router}/>       
       </form>
       {/* TODO: Show confirmation or error. */}
     </div>

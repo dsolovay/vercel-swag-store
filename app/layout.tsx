@@ -5,6 +5,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 import { ShoppingCart } from "lucide-react";
+import { getCart } from "./lib/data";
+import { cookies } from "next/headers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +37,25 @@ async function Footer() {
     </footer>
   );
 }
+
+async function CartQunantityBadge() {
+  const cookieStore = await cookies();
+  const cartToken = cookieStore.get("cart")?.value;
+  const cart = cartToken ? await getCart(cartToken) : null;
+  
+  const quantity = cart?.data.items.reduce((acc, item) => acc + item.quantity, 0) ?? 0;
+
+  if (quantity === 0) {
+    return null;
+  }
+  return (
+    <span className="inline-flex items-center justify-center rounded-full bg-blue-500 px-1 text-xs font-bold text-white
+    absolute  -top-2 -right-2 min-w-[1.1rem] h-[1.1rem]">
+      {quantity}
+    </span>
+  );
+}
+
 
 export const metadata: Metadata = {
   title: titleTemplate,
@@ -88,9 +109,12 @@ export default function RootLayout({
                 </Link>
                 <Link
                   href="/cart"
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                  className="text-sm font-medium text-gray-600 hover:text-gray-900 relative"
                 >
                   <ShoppingCart size={20} />
+                  <Suspense fallback={<span className="sr-only"></span>}>
+                    <CartQunantityBadge />
+                  </Suspense>
                   {/* TODO badge with number of items in cart */}
                 </Link>
               </nav>

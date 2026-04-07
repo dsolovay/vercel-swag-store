@@ -8,6 +8,7 @@ import {
   deleteProductFromCart,
   updateProductQuantity,
 } from "../lib/cart-server-actions"; 
+import { useRouter } from "next/navigation";
 
 function CopyCart(cart: Cart): Cart {
   return {
@@ -29,6 +30,7 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
   }
   const [error, setError] = useState(false);
   const [cart, setCart] = useState(cartProp.data);
+  const router =  useRouter();
   
   const [optimisticCart, optimisticDeleteRow] = useOptimistic(
     cart,
@@ -65,6 +67,7 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
         setError(true);
       } else {
         setCart(response.data);
+        router.refresh();
       }
       
     });
@@ -90,6 +93,7 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
       setError(true);
     } else {
       setCart(response.data);
+      router.refresh();
     }
   }
 
