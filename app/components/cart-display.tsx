@@ -3,7 +3,7 @@
 import { Price } from "./Price";
 import { Cart } from "@/app/lib/types";
 import { CartLine } from "./cart-line";
-import { useTransition, useOptimistic, useState } from "react";
+import { useOptimistic, useState, startTransition } from "react";
 import {
   deleteProductFromCart,
   updateProductQuantity,
@@ -30,7 +30,6 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
   const [error, setError] = useState(false);
   const [cart, setCart] = useState(cartProp.data);
   
-  const [isPending, startTransition] = useTransition();
   const [optimisticCart, dispatch] = useOptimistic(
     cart,
     (
@@ -114,45 +113,27 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
     });
   }
 
-  function handleIncrement(productId: string) {
-    console.log("incrementing", productId);
-    const currrentQuantity: number | undefined = optimisticCart.items.find(
-        (item) => item.productId === productId,
-      )?.quantity;
-    if (currrentQuantity === undefined) return;     
-    const newQuantity = currrentQuantity + 1;
-
-    startTransition(async () => {
-      dispatch({ type: "increment", productId });
-      
-      const response = await updateProductQuantity(productId, newQuantity);
-      console.log("update quantity response", response);
-      if (!response.success) {
-        setError(true);
-      } else {
-        setCart(response.data);
-      }
-    });
+  function handleQuantityChange(productId: string, quantity: number) {
+    setCart((prev) => ({
+      ...prev,
+      items: prev.items.map((i) =>
+        i.productId === productId ? { ...i, quantity } : i,
+      ),
+      subtotal: prev.items.reduce(
+        (sum, i) =>
+          sum + i.product.price * (i.productId === productId ? quantity : i.quantity),
+        0,
+      ),
+    }));
   }
 
-  function handleDecrement(productId: string) {
-    console.log("decrementing", productId);
-     const currrentQuantity: number | undefined = optimisticCart.items.find(
-        (item) => item.productId === productId,
-      )?.quantity;
-      if (currrentQuantity === undefined) return;
-      const newQuantity = Math.max(currrentQuantity - 1, 0);
-    startTransition(async () => {
-      dispatch({ type: "decrement", productId });
-     
-      const response = await updateProductQuantity(productId, newQuantity);
-      console.log("update quantity response", response);
-      if (!response.success) {
-        setError(true);
-      } else {
-        setCart(response.data);
-      }
-    });
+  async function handleQuantitySettle(productId: string, quantity: number) {
+    const response = await updateProductQuantity(productId, quantity);
+    if (!response.success) {
+      setError(true);
+    } else {
+      setCart(response.data);
+    }
   }
 
   return (
@@ -183,9 +164,8 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
                 key={item.productId}
                 item={item}
                 onDelete={handleDelete}
-                onIncrement={handleIncrement}
-                onDecrement={handleDecrement}
-                isPending={isPending}  // Avoids race conditions. useIncrement might resolve this better.
+                onQuantityChange={handleQuantityChange}
+                onQuantitySettle={handleQuantitySettle}
               />
             ))}
           </tbody>
