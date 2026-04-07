@@ -46,7 +46,7 @@ function RemoveButton({
   );
 }
 
-export function CartLine({ item, onDelete, onIncrement, onDecrement }: { item: Cart["items"][number], onDelete: (productId: string) => void, onIncrement: (productId: string) => void, onDecrement: (productId: string) => void }) {
+export function CartLine({ item, onDelete, onIncrement, onDecrement, isPending }: { item: Cart["items"][number], onDelete: (productId: string) => void, onIncrement: (productId: string) => void, onDecrement: (productId: string) => void, isPending: boolean }) {
 
   return (
     <>
@@ -61,7 +61,7 @@ export function CartLine({ item, onDelete, onIncrement, onDecrement }: { item: C
                   <td className="w-24 text-sm text-gray-500 pr-3">Quantity:</td>
                   <td className="w-24">
                     <div className="flex justify-end">
-                      <QuantityControl decrement={() => onDecrement(item.productId)} item={item} increment={() => onIncrement(item.productId)} />
+                      <QuantityControl isPending={isPending} decrement={() => onDecrement(item.productId)} item={item} increment={() => onIncrement(item.productId)} />
                     </div>
                   </td>
                 </tr>
@@ -109,6 +109,7 @@ export function CartLine({ item, onDelete, onIncrement, onDecrement }: { item: C
             decrement={() => onDecrement(item.productId)}
             item={item}
             increment={() => onIncrement(item.productId)}
+            isPending={isPending}
           />
         </td>
         <td className="py-4 px-4 text-right">
@@ -128,10 +129,12 @@ export function CartLine({ item, onDelete, onIncrement, onDecrement }: { item: C
   );
 }
 function QuantityControl({
+  isPending,
   decrement,
   item,
   increment,
 }: {
+  isPending: boolean;
   decrement: () => void;
   item: CartItem;
   increment: () => void;
@@ -140,14 +143,15 @@ function QuantityControl({
     <div className="flex items-center gap-2 justify-end">
       <Minus
         size={14}
-        className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-        onClick={decrement}
+        
+        className={`text-gray-400 ${!isPending ? 'hover:text-red-500' : ''} transition-colors cursor-pointer ${isPending ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+        onClick={!isPending ? decrement : undefined}
       />
       <span className="w-6 text-center tabular-nums">{item.quantity}</span>
       <Plus
         size={14}
-        className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-        onClick={increment}
+        className={`text-gray-400 ${!isPending ? 'hover:text-red-500' : ''} transition-colors cursor-pointer ${isPending ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+        onClick={!isPending ? increment : undefined}
       />
     </div>
   );

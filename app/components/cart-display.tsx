@@ -3,12 +3,11 @@
 import { Price } from "./Price";
 import { Cart } from "@/app/lib/types";
 import { CartLine } from "./cart-line";
-import { startTransition, useOptimistic, useState } from "react";
+import { useTransition, useOptimistic, useState } from "react";
 import {
   deleteProductFromCart,
   updateProductQuantity,
-} from "../lib/cart-server-actions";
-import { useRouter } from "next/navigation";
+} from "../lib/cart-server-actions"; 
 
 function CopyCart(cart: Cart): Cart {
   return {
@@ -20,13 +19,18 @@ function CopyCart(cart: Cart): Cart {
     // Product objects are not deep copied, as they are not mutated.
   };
 }
-export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
-  const router = useRouter();
+
+
+// TODO Only use optimistic for delete.
+// For quantity, use useState, and debounce 400ms before updating the server.
+export function CartDisplay(cartProp: { success: boolean; data: Cart }) {   
   {
     /* Apply optimistic concurrency pattern from React docs. */
   }
   const [error, setError] = useState(false);
   const [cart, setCart] = useState(cartProp.data);
+  
+  const [isPending, startTransition] = useTransition();
   const [optimisticCart, dispatch] = useOptimistic(
     cart,
     (
@@ -112,13 +116,15 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
 
   function handleIncrement(productId: string) {
     console.log("incrementing", productId);
-    startTransition(async () => {
-      dispatch({ type: "increment", productId });
-      const currrentQuantity: number | undefined = optimisticCart.items.find(
+    const currrentQuantity: number | undefined = optimisticCart.items.find(
         (item) => item.productId === productId,
       )?.quantity;
-      if (currrentQuantity === undefined) return;
-      const newQuantity = currrentQuantity + 1;
+    if (currrentQuantity === undefined) return;     
+    const newQuantity = currrentQuantity + 1;
+
+    startTransition(async () => {
+      dispatch({ type: "increment", productId });
+      
       const response = await updateProductQuantity(productId, newQuantity);
       console.log("update quantity response", response);
       if (!response.success) {
@@ -131,13 +137,14 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
 
   function handleDecrement(productId: string) {
     console.log("decrementing", productId);
-    startTransition(async () => {
-      dispatch({ type: "decrement", productId });
-      const currrentQuantity: number | undefined = optimisticCart.items.find(
+     const currrentQuantity: number | undefined = optimisticCart.items.find(
         (item) => item.productId === productId,
       )?.quantity;
       if (currrentQuantity === undefined) return;
       const newQuantity = Math.max(currrentQuantity - 1, 0);
+    startTransition(async () => {
+      dispatch({ type: "decrement", productId });
+     
       const response = await updateProductQuantity(productId, newQuantity);
       console.log("update quantity response", response);
       if (!response.success) {
@@ -178,6 +185,7 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
                 onDelete={handleDelete}
                 onIncrement={handleIncrement}
                 onDecrement={handleDecrement}
+                isPending={isPending}  // Avoids race conditions. useIncrement might resolve this better.
               />
             ))}
           </tbody>
