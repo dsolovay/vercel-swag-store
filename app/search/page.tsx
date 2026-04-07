@@ -5,8 +5,8 @@ import Image from "next/image";
 import Link from "next/link"
 import { Price } from "@/app/components/Price";
 
-async function SearchResults() {
-  const productResponse = await getProducts();
+async function SearchResults({search}: {search?: string}) {
+  const productResponse = await getProducts({page: 1, limit: 5, search: search ?? null, featured: false});
   if (!productResponse.success)   return <p className="text-red-500">Failed to load products.</p>;
 
   const products = productResponse.data;
@@ -43,7 +43,8 @@ export const metadata: Metadata = {
     description: "Search for your favorite Vercel swag items.",
   },
 };
-export default function Search() {
+export default async function Search({searchParams}: {searchParams: Promise<{search?: string}>}) {
+  const {search } = await searchParams;
   return (
     <div>
       <h1 className="font-bold text-2xl px-4 py-4">Product Search</h1>
@@ -59,7 +60,7 @@ export default function Search() {
       </form>
       
       <Suspense fallback={<p>TODO: Loading Skelton</p>}>
-        <SearchResults />
+        <SearchResults search={search} />
       </Suspense>
     </div>
   );
