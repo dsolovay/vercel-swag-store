@@ -4,13 +4,8 @@ import { Trash, Plus, Minus } from "lucide-react";
 import Image from "next/image";
 import { Cart, CartItem } from "@/app/lib/types";
 import { Price } from "@/app/components/Price";
-import {
-  deleteProductFromCart,
-  updateProductQuantity,
-} from "../lib/cart-server-actions";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { on } from "events";
+
 
 function ImageAndDescription(item: CartItem) {
   return (
@@ -51,28 +46,8 @@ function RemoveButton({
   );
 }
 
-export function CartLine({ item }: { item: Cart["items"][number] }) {
-  const router = useRouter();
+export function CartLine({ item, onDelete, onIncrement, onDecrement }: { item: Cart["items"][number], onDelete: (productId: string) => void, onIncrement: (productId: string) => void, onDecrement: (productId: string) => void }) {
 
-  // TODO Figure out if there's an "optimistic UI" way to do this so that we don't have to wait for the server response before updating the UI. Be able to handle errors however.
-  async function handleDelete() {
-    await deleteProductFromCart(item.productId);
-    router.refresh();
-  }
-
-  async function increment() {
-    await updateProductQuantity(item.productId, item.quantity + 1);
-    router.refresh();
-  }
-
-  async function decrement() {
-    await updateProductQuantity(item.productId, item.quantity - 1);
-    router.refresh();
-  }
-
-  {
-    /* TODO: On mobile, show picture in one column, have description and controls in another column. Hide column headings on mmobile. */
-  }
   return (
     <>
       {/* Mobile */}
@@ -86,7 +61,7 @@ export function CartLine({ item }: { item: Cart["items"][number] }) {
                   <td className="w-24 text-sm text-gray-500 pr-3">Quantity:</td>
                   <td className="w-24">
                     <div className="flex justify-end">
-                      <QuantityControl decrement={decrement} item={item} increment={increment} />
+                      <QuantityControl decrement={() => onDecrement(item.productId)} item={item} increment={() => onIncrement(item.productId)} />
                     </div>
                   </td>
                 </tr>
@@ -112,7 +87,7 @@ export function CartLine({ item }: { item: Cart["items"][number] }) {
                   <td className="w-24 text-sm text-gray-500 pr-3">Remove:</td>
                   <td className="w-24">
                     <div className="flex justify-end">
-                      <RemoveButton onClick={handleDelete} item={item} />
+                      <RemoveButton onClick={() => onDelete(item.productId)} item={item} />
                     </div>
                   </td>
                 </tr>
@@ -131,9 +106,9 @@ export function CartLine({ item }: { item: Cart["items"][number] }) {
         </td>
         <td className=" py-4 px-4">
           <QuantityControl
-            decrement={decrement}
+            decrement={() => onDecrement(item.productId)}
             item={item}
-            increment={increment}
+            increment={() => onIncrement(item.productId)}
           />
         </td>
         <td className="py-4 px-4 text-right">
@@ -146,7 +121,7 @@ export function CartLine({ item }: { item: Cart["items"][number] }) {
           />
         </td>
         <td className="py-4 pl-6 text-right">
-          <RemoveButton onClick={handleDelete} item={item} />
+          <RemoveButton onClick={() => onDelete(item.productId)} item={item} />
         </td>
       </tr>
     </>
@@ -157,9 +132,9 @@ function QuantityControl({
   item,
   increment,
 }: {
-  decrement: () => Promise<void>;
+  decrement: () => void;
   item: CartItem;
-  increment: () => Promise<void>;
+  increment: () => void;
 }) {
   return (
     <div className="flex items-center gap-2 justify-end">
