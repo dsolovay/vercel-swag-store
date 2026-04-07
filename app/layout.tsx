@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
+import { ShoppingCart } from "lucide-react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -71,30 +72,26 @@ export default function RootLayout({
                   className="h-10! w-auto"
                 />
 
-                 
-                <span className="text-xl font-bold text-gray-900">
-                  Vercel Swag Store
-                </span>
+                <Link href="/" className="text-sm font-medium text-gray-900">
+                  <span className="text-xl font-bold text-gray-900">
+                    Vercel Swag Store
+                  </span>
+                </Link>
               </div>
               {/* Navigation */}
               <nav className="flex gap-6">
-                <Link
-                  href="/"
-                  className="text-sm font-medium text-gray-600 hover:text-gray-900"
-                >
-                  Home
-                </Link>
                 <Link
                   href="/search"
                   className="text-sm font-medium text-gray-600 hover:text-gray-900"
                 >
                   Search
                 </Link>
-                 <Link
+                <Link
                   href="/cart"
                   className="text-sm font-medium text-gray-600 hover:text-gray-900"
                 >
-                  Cart
+                  <ShoppingCart size={20} />
+                  {/* TODO badge with number of items in cart */}
                 </Link>
               </nav>
             </div>
