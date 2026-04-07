@@ -38,7 +38,7 @@ function RemoveButton({
     <button
       type="button"
       onClick={onClick}
-      className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+      className="text-gray-500 hover:text-red-500 transition-colors cursor-pointer"
       aria-label={`Remove ${item.product.name} from cart`}
     >
       <Trash size={16} />
@@ -161,14 +161,14 @@ function QuantityControl({
   return (
     <div className="flex items-center gap-2 justify-end">
       <Minus
-        size={14}
-        className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+        size={16}
+        className="text-gray-500 hover:text-red-500 transition-colors cursor-pointer"
         onClick={decrement}
       />
       <span className="w-6 text-center tabular-nums">{quantity}</span>
       <Plus
-        size={14}
-        className="text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+        size={16}
+        className="text-gray-500 hover:text-green-500 transition-colors cursor-pointer"
         onClick={increment}
       />
     </div>
