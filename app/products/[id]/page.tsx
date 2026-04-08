@@ -72,7 +72,10 @@ export default async function ProductDetailPage({
 }
 
 export async function generateStaticParams() {
-  const products = await getProducts({featured: false, limit: 200, page: 1});
+  const products = await getProducts();
+  if (!products.success || !products.data) {
+    return [];
+  }
   return products.data.map((product) => ({ id: product.id }));
 } 
 
