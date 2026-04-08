@@ -26,7 +26,7 @@ function ProductCard({ product }: { product: Product }) {
 }
 
 export default async function FeaturedProducts() {
-  const productResponse = await getProducts(/* featured */ true);
+  const productResponse = await getProducts({featured: true, limit: 6, page: 1});
   if (!productResponse.success || !productResponse.data) {
     return null;
   }
