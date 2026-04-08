@@ -26,19 +26,22 @@ function doFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
 export type SearchProductParams = {
   page?: number;
   limit?: number;
-  search?: string | null;
+  q?: string | null;
   featured?: boolean;
+  category?: string | null;
 }
 
 export async function getProducts(params: SearchProductParams = {}): Promise<ProductsResponse> {
   "use cache";
   cacheLife("minutes");
-  
+
   const searchParms = new URLSearchParams();
   if (params.page) searchParms.append("page", params.page.toString());
   if (params.limit) searchParms.append("limit", params.limit.toString());
-  if (params.search) searchParms.append("search", params.search);
+  if (params.q) searchParms.append("search", params.q);
   if (params.featured) searchParms.append("featured", "true");
+  if (params.category) searchParms.append("category", params.category);
+
   // TODO use a proper query string builder.
   return doFetch(`/products?${searchParms.toString()}`);
 }

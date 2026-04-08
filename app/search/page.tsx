@@ -4,12 +4,42 @@ import { getProducts } from "@/app/lib/data";
 import Image from "next/image";
 import Link from "next/link"
 import { Price } from "@/app/components/Price";
+import { SearchForm } from "./search-form";
 
-async function SearchResults({search}: {search?: string}) {
-  const productResponse = await getProducts({page: 1, limit: 5, search: search ?? null, featured: false});
+type SearchResultsProps =   Promise<{q?: string, category?:string}>;
+ 
+ 
+
+export default async function Search({searchParams}: {searchParams: SearchResultsProps}) {
+
+  
+  return (
+    <div>
+      <h1 className="font-bold text-2xl px-4 py-4">Product Search</h1>
+      <Suspense fallback={null}>
+        <SearchForm  />
+      </Suspense>
+       
+      <Suspense fallback={<p>TODO: Loading Skelton</p>}>
+        <SearchResults searchResultParams={searchParams} />
+      </Suspense>
+    </div>
+  );
+}
+
+ 
+
+async function SearchResults({searchResultParams}: {searchResultParams: SearchResultsProps}) {
+  const {q, category } = await searchResultParams;
+  
+  const productResponse = await getProducts({page: 1, limit: 5, q: q ?? null, category: category ?? null, featured: false});
   if (!productResponse.success)   return <p className="text-red-500">Failed to load products.</p>;
 
   const products = productResponse.data;
+
+  if (products.length === 0) {
+    return <p className="text-gray-600 mt-4 ml-4">No products found.</p>;
+  }
 
   return (
    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -25,11 +55,11 @@ async function SearchResults({search}: {search?: string}) {
             width={500}
             height={500}
             className="w-full h-48 object-contain mt-2"
+            loading="eager"
           />
           <Price price={product.price} currency={product.currency} />
           </Link>
-        </div>
-        
+        </div>        
       ))}
     </div>
 
@@ -43,25 +73,4 @@ export const metadata: Metadata = {
     description: "Search for your favorite Vercel swag items.",
   },
 };
-export default async function Search({searchParams}: {searchParams: Promise<{search?: string}>}) {
-  const {search } = await searchParams;
-  return (
-    <div>
-      <h1 className="font-bold text-2xl px-4 py-4">Product Search</h1>
-      <form className="px-4 py-2">
-        <input
-          type="text"
-          placeholder="Search for products..."
-          className="border rounded px-2 py-1 w-full"
-        />
-        <button type="submit" className="mt-2 bg-blue-500 text-white px-4 py-2 rounded">
-          Search
-        </button>
-      </form>
-      
-      <Suspense fallback={<p>TODO: Loading Skelton</p>}>
-        <SearchResults search={search} />
-      </Suspense>
-    </div>
-  );
-}
+
