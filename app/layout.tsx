@@ -44,7 +44,7 @@ async function CartQunantityBadge() {
   const cart = cartToken ? await getCart(cartToken) : null;
 
   const quantity =
-    cart?.data.items.reduce((acc, item) => acc + item.quantity, 0) ?? 0;
+    cart?.data?.items.reduce((acc, item) => acc + item.quantity, 0) ?? 0;
 
   if (quantity === 0) {
     return null;
