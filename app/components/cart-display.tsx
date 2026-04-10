@@ -63,7 +63,7 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
     startTransition(async () => {
       optimisticDeleteRow({ productId });
       const response = await deleteProductFromCart(productId);
-      if (!response.success) {
+      if (!response.success || !response.data) {
         setError(true);
       } else {
         setCart(response.data);
@@ -89,7 +89,7 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
 
   async function handleQuantitySettle(productId: string, quantity: number) {
     const response = await updateProductQuantity(productId, quantity);
-    if (!response.success) {
+    if (!response.success || !response.data) {
       setError(true);
     } else {
       setCart(response.data);
