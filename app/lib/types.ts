@@ -1,13 +1,14 @@
-export type ApiResponse<TData, TMeta = undefined> = TMeta extends undefined
-  ? {
-      success: boolean;
-      data: TData;
-    }
-  : {
-      success: boolean;
-      data: TData;
-      meta: TMeta;
-    };
+export type ApiResponse<TData, TMeta=undefined> = {
+  success: boolean;
+  data?: TData;
+  meta?: TMeta;
+  error?: {
+    code: string;
+    message: string;
+    details: unknown; /* Included in the API docs, but no type info provided. */
+  };
+};
+
 
 export type Product = {
   id: string;
@@ -31,13 +32,6 @@ export type Pagination = {
   hasNextPage: boolean;
   hasPreviousPage: boolean;
 };
-
-export type ProductsResponse = ApiResponse<
-  Product[],
-  { pagination: Pagination }
->;
-
-export type ProductDetailsResponse = ApiResponse<Product>;
 
 export type Promotion = {
   id: string;
@@ -81,7 +75,3 @@ export type CartItem = {
   product: Product;
   lineTotal: number; 
 } & DateInfo & AmountInfo;
-
-export type PromotionResponse = ApiResponse<Promotion>;
-
-

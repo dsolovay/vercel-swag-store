@@ -1,6 +1,6 @@
 
 
-import { ProductDetailsResponse, ProductsResponse, PromotionResponse, AvailabilityInfo, ApiResponse, Cart } from "./types";
+import { AvailabilityInfo, ApiResponse, Cart, Product, Pagination, Promotion } from "./types";
 
 import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
@@ -31,7 +31,7 @@ export type SearchProductParams = {
   category?: string | null;
 }
 
-export async function getProducts(params: SearchProductParams = {}): Promise<ProductsResponse> {
+export async function getProducts(params: SearchProductParams = {}): Promise<ApiResponse<Product[], Pagination>> {
   "use cache";
   cacheLife("minutes");
 
@@ -46,13 +46,13 @@ export async function getProducts(params: SearchProductParams = {}): Promise<Pro
   return doFetch(`/products?${searchParms.toString()}`);
 }
 
-export async function getActivePromotion(): Promise<PromotionResponse> {
+export async function getActivePromotion(): Promise<ApiResponse<Promotion>> {
   "use cache";
   cacheLife("minutes");
   return doFetch(`/promotions?active=true`);
 }
 
-export async function getProductDetails(id: string): Promise<ProductDetailsResponse> {
+export async function getProductDetails(id: string): Promise<ApiResponse<Product>> {
   "use cache";
   cacheLife("minutes");
   return doFetch(`/products/${id}`);
