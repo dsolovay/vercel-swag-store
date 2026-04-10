@@ -21,8 +21,6 @@ function CopyCart(cart: Cart): Cart {
   };
 }
 
-
-// TODO Only use optimistic for delete.
 // For quantity, use useState, and debounce 400ms before updating the server.
 export function CartDisplay(cartProp: { success: boolean; data: Cart }) {   
   {
