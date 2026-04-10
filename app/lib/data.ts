@@ -16,7 +16,12 @@ function doFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   return fetch(`${basePath}${cleanPath}`, {
     ...options,
   })
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) {
+        throw new Error(`Request failed with status ${res.status}: ${res.statusText}`);
+      }
+      return res.json();
+    })
     .catch(err => {
       console.error(`Error fetching ${path}:`, err);
       throw err;
