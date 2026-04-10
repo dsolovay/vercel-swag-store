@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState, useRef } from "react";import { Cart, CartItem } from "@/app/lib/types";
 import { Price } from "@/app/components/Price";
 import Link from "next/link";
-
+import debounce from "lodash.debounce";
 
 function ImageAndDescription(item: CartItem) {
   return (
@@ -57,17 +57,15 @@ export function CartLine({
   onQuantityChange: (productId: string, quantity: number) => void;
   onQuantitySettle: (productId: string, quantity: number) => void;
 }) {
-  const [localQty, setLocalQty] = useState(item.quantity);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [localQty, setLocalQty] = useState(item.quantity);   
 
   function changeQty(delta: 1 | -1) {
     const next = Math.max(1, localQty + delta);
     setLocalQty(next);
     onQuantityChange(item.productId, next);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
+    debounce(() => {
       onQuantitySettle(item.productId, next);
-    }, 400);
+    }, 400)();
   }
 
   return (

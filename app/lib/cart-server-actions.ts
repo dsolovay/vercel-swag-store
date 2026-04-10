@@ -7,8 +7,14 @@ import { ServerActionResponse } from "./state";
 export async function addProductToCart(productId: string, prevState: ServerActionResponse, formData: FormData): Promise<ServerActionResponse>    {
   const cartToken = await getCartToken();
   const quantity = Number(formData.get("quantity"));
+  console.log("Adding to cart", { productId, quantity, cartToken });
   try {
-    await addToCart({"productId": productId, "quantity": quantity, "cartToken": cartToken});
+    const result = await addToCart({"productId": productId, "quantity": quantity, "cartToken": cartToken});
+    if (!result.success || !result.data) {
+      console.error("Failed to add to cart", result.error);
+      return { state: "error" };
+    }
+    console.log("Add to cart result", result);
     return { state: "success" };
   } catch (error) {
     console.error("Error adding product to cart:", error);
@@ -32,6 +38,9 @@ async function getCartToken(): Promise<string> {
     return cookieStore.get("cart")?.value ?? "";
   } else {
     const cartResponse = await createCart();
+    if (!cartResponse || cartResponse.success === false || !cartResponse.data) {
+      throw new Error("Failed to create cart");
+    }
     cookieStore.set("cart", cartResponse.data.token);
     return cartResponse.data.token;
   }

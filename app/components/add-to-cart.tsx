@@ -72,8 +72,7 @@ export function AddToCartButton({
         </select>
         <SubmitButton stock={stock}  />
         <Feedback state={state} router={router}/>       
-      </form>
-      {/* TODO: Show confirmation or error. */}
+      </form>      
     </div>
   );
 }
