@@ -37,7 +37,7 @@ async function SearchResults({searchResultParams}: {searchResultParams: SearchRe
 
   const products = productResponse.data;
 
-  if (products.length === 0) {
+  if (!products || products.length === 0) {
     return <p className="text-gray-600 mt-4 ml-4">No products found.</p>;
   }
 
