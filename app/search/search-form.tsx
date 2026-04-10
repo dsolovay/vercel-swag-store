@@ -64,7 +64,14 @@ export function SearchForm() {
       >
         Categories
       </label>
-      <select title="category select" name="category" onChange={categoryOnChange}className="border rounded px-2 py-1 w-full mt-2">
+      <select 
+        title="category select" 
+        name="category" 
+        onChange={categoryOnChange}
+        className="border rounded px-2 py-1 w-full mt-2"
+        defaultValue={searchParams.get("category") ?? ""}
+        >
+      
         <option value="">All Categories</option>
         {Categories.map((category) => (
           <option key={category} title={category}>
@@ -76,9 +83,10 @@ export function SearchForm() {
         <input
           name="search"
           onChange={onTextChange}
-          className="border rounded px-2 py-1 w-full my -4"
+          className="border rounded px-2 py-1 w-full my-4"
           type="text"
           placeholder="Search for products..."
+          defaultValue={searchParams.get("q") ?? ""}
         />
       </div>
 
