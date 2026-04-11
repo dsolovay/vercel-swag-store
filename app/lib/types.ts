@@ -1,5 +1,6 @@
 export type ApiResponse<TData, TMeta=undefined> = {
   success: boolean;
+  statusCode: number;
   data?: TData;
   meta?: TMeta;
   error?: {

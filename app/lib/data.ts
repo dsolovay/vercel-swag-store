@@ -7,26 +7,26 @@ import { cacheLife, cacheTag } from "next/cache";
 const basePath = (process.env.API_BASE_URL ?? "").replace(/\/+$/, ""); // Remove trailing slashes
 // TODO - add error if not set
 
-function doFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
+async function doFetch<T>(path: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
   options.headers = {
     ...options.headers,
     "x-vercel-protection-bypass": process.env.VERCEL_PROTECTION_BYPASS ?? '',
   };
-  return fetch(`${basePath}${cleanPath}`, {
+
+  const rawResponse = await fetch(`${basePath}${cleanPath}`, {
     ...options,
-  })
-    .then(res => {
-      if (!res.ok) {
-        throw new Error(`Request failed with status ${res.status}: ${res.statusText}`);
-      }
-      return res.json();
-    })
-    .catch(err => {
-      console.error(`Error fetching ${path}:`, err);
-      throw err;
-    });
+  });
+  const result = await rawResponse.json() as ApiResponse<T>;
+  if (!rawResponse.ok) {
+    // Safe to log because this is server code, so message will go to terminal, not console.
+    console.error(`API request to ${cleanPath} failed with status ${rawResponse.status}:`, result.error);
+  }
+  result.success = rawResponse.ok;
+  result.statusCode = rawResponse.status; // Include status code in the response for better error handling.
+  return result;
 }
+    
 
 export type SearchProductParams = {
   page?: number;
