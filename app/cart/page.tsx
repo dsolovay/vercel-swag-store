@@ -4,6 +4,7 @@ import { CartDisplay } from "../components/cart-display";
 
 export default async function CartPage() {
   const cookieStore = await cookies();
+  // TODO -- keep all token references in the cart-services file, which will have ownership of keeping it fresh.
   const cartToken = cookieStore.get("cart")?.value;
   const cartResponse = cartToken ? await getCart(cartToken) : null;
 

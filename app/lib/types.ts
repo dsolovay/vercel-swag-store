@@ -9,7 +9,7 @@ export type ApiResponse<TData, TMeta=undefined> = {
     details: unknown; /* Included in the API docs, but no type info provided. */
   };
 };
-
+// TODO Have a separate responses for server actions, to ensure error details are not exposed to client.
 
 export type Product = {
   id: string;

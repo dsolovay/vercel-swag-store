@@ -85,12 +85,19 @@ export function addToCart(data: { productId: string; quantity: number; cartToken
     });
 }
 
-export function getCart(cartToken: string): Promise<ApiResponse<Cart>> {
-  return doFetch('/cart', {
+export async function getCart(cartToken: string): Promise<ApiResponse<Cart>> {
+  const getCartResponse = await doFetch<Cart>('/cart', {
     headers: {
       "x-cart-token": cartToken,
     }
   });
+  if (!getCartResponse.success && getCartResponse.statusCode === 404) {
+    console.warn("Cart not found, creating new cart.");
+    return await createCart();
+  }
+  // Thid function need to handle statle cookies leading to a a permanenet 404 scenario.
+  // If a 404 is received, create a new cart.
+  return getCartResponse;
 }
 
 // TODO handle errors
