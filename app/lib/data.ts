@@ -1,13 +1,18 @@
 
 
-import { AvailabilityInfo, ApiResponse, Cart, Product, Pagination, Promotion } from "./types";
 
 import "server-only";
+import { AvailabilityInfo, ApiResponse, Cart, Product, Pagination, Promotion } from "./types";
 import { cacheLife, cacheTag } from "next/cache";
+
+// This file wraps all API interactions. It is only called by cart-service-actions.
+// This ensures that error invformation is kept on the server.
+// All error handling is done in cart-server-actions, so that the rest of the application can assume all responses are successful, and not worry about error scenarios. If an error occurs, it is logged, and a failed response is returned, but no error details are included in the response. This is to prevent accidental exposure of sensitive information in error messages. The cart-server-actions file will also include logic for handling stale cart scenarios.
+
 const basePath = (process.env.API_BASE_URL ?? "").replace(/\/+$/, ""); // Remove trailing slashes
 // TODO - add error if not set
 
-async function doFetch<T>(path: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+async function doFetch<T,U = undefined>(path: string, options: RequestInit = {}): Promise<ApiResponse<T,U>> {
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
   options.headers = {
     ...options.headers,
@@ -17,10 +22,10 @@ async function doFetch<T>(path: string, options: RequestInit = {}): Promise<ApiR
   const rawResponse = await fetch(`${basePath}${cleanPath}`, {
     ...options,
   });
-  const result = await rawResponse.json() as ApiResponse<T>;
+  const result = await rawResponse.json() as ApiResponse<T,U>;
   if (!rawResponse.ok) {
     // Safe to log because this is server code, so message will go to terminal, not console.
-    console.error(`API request to ${cleanPath} failed with status ${rawResponse.status}:`, result.error);
+    console.warn(`API request to ${cleanPath} failed with status ${rawResponse.status}:`, result.error);
   }
   result.success = rawResponse.ok;
   result.statusCode = rawResponse.status; // Include status code in the response for better error handling.
@@ -46,8 +51,8 @@ export async function getProducts(params: SearchProductParams = {}): Promise<Api
   if (params.q) searchParms.append("search", params.q);
   if (params.featured) searchParms.append("featured", "true");
   if (params.category) searchParms.append("category", params.category);
-
-  // TODO use a proper query string builder.
+ 
+  // TODO - resolve type issue.
   return doFetch(`/products?${searchParms.toString()}`);
 }
 
@@ -100,7 +105,6 @@ export async function getCart(cartToken: string): Promise<ApiResponse<Cart>> {
   return getCartResponse;
 }
 
-// TODO handle errors
 export function deleteCartLine(data: { productId: string; cartToken: string }): Promise<ApiResponse<Cart>> {
   return doFetch(`/cart/${data.productId}`,
     {

@@ -3,23 +3,26 @@
 import { cookies } from "next/headers";
 import { addToCart, createCart, deleteCartLine, updateQuantity } from "./data";
 import { ServerActionResponse } from "./state";
-import { getCart as getCartApi } from "./data";
-import { get } from "http";
-import { ApiResponse, Cart } from "./types";
-import { refresh } from "next/cache";
+import { getCart as getCartApi } from "./data"; 
+import { ApiResponse, ServiceResponse, Cart } from "./types";
 
-// All mothods in this file need to handle 404 cart stale scenario, by creating a new cart and retrying the action.
+ 
 
-export async function getCart(): Promise<ApiResponse<Cart>> {
+// This file exposes cart and products to the rest of the application. It handles cookie management and stale cart scenarios, to ensure the rest of the application can interact with the cart without needing to worry about these details. All functions in this file are server actions, and can be called directly from client components.
+
+// For now, product detail is directly pulled from the data layer, but that will be fixed soon.
+
+export async function getCart(): Promise<ServiceResponse<Cart>> {
+
   const cartTokenResponse = await getCartToken();
   if (cartTokenResponse.cartResponse) {
-    return cartTokenResponse.cartResponse;
+    return handleAndWrapResponse(cartTokenResponse.cartResponse);
   }
   const cartResponse = await getCartApi(cartTokenResponse.cartToken);
   if (!cartResponse.success && cartResponse.statusCode === 404) {
     return getNewCartAndRefreshToken();
   }
-  return cartResponse;
+  return handleAndWrapResponse(cartResponse)  ;
 }
 
 export async function addProductToCart(productId: string, prevState: ServerActionResponse, formData: FormData): Promise<ServerActionResponse> {
@@ -63,7 +66,7 @@ export async function addProductToCart(productId: string, prevState: ServerActio
   }
 }
 // TODO naming convetion to make server functions easier to identify? E.g. prefix with "server" or "action" or something like that.
-export async function deleteProductFromCart(productId: string) {
+export async function deleteProductFromCart(productId: string): Promise<ServiceResponse<Cart>> {
   const cartTokenResponse = await getCartToken();
   const response = await deleteCartLine({ "productId": productId, "cartToken": cartTokenResponse.cartToken });
 
@@ -72,20 +75,20 @@ export async function deleteProductFromCart(productId: string) {
     return await getNewCartAndRefreshToken();
   }
   
-  if (response.success === false) {
+  if (response.success === false || !response.data) {
     console.error("Failed to delete cart line", response.statusCode, response.error);
-    return { success: false, statusCode: response.statusCode, error: response.error };
+    return { success: false };
   }
 
-  return response;
+  return {success: true, data: response.data};
 }
 
-export async function updateProductQuantity(productId: string, quantity: number) {
+export async function updateProductQuantity(productId: string, quantity: number):Promise<ServiceResponse<Cart>> {
   const cartTokenResponse = await getCartToken();
   const response = await updateQuantity({ "productId": productId, "quantity": quantity, "cartToken": cartTokenResponse.cartToken });
 
   if (response.success) {
-    return response;
+    return { success: true, data: response.data };
   }
 
   if (response.statusCode === 404) {
@@ -98,7 +101,7 @@ export async function updateProductQuantity(productId: string, quantity: number)
     const retryResponse = await updateQuantity({ "productId": productId, "quantity": quantity, "cartToken": newCartResponse.data?.token ?? "" });
     if (retryResponse.success) {
       console.log("Update quantity retry successful", retryResponse);
-      return retryResponse;
+      return  { success: true, data: retryResponse.data };
     } else {
       console.error("Failed to update quantity after retry", retryResponse.statusCode, retryResponse.error);
       return { success: false };
@@ -108,6 +111,22 @@ export async function updateProductQuantity(productId: string, quantity: number)
   console.error("Failed to update cart line", response.statusCode, response.error);
   return { success: false };
 }
+
+/**
+ * Helper method for evaluting responses, logging errors, and wrapping in the correct format.
+ * TODO Wrap 404 logic here.
+ * @returns ServerResponse<TData>
+ */
+
+const handleAndWrapResponse = <TData>(response: ApiResponse<TData>, retryAction?: () => Promise<ApiResponse<TData>>): ServiceResponse<TData> => {
+  if (response.success && response.data) {
+    return { success: true, data: response.data };
+  } else {
+    console.error("API response error", response.statusCode, response.error);
+    return { success: false };
+  }
+};
+
 
 /**
  * Guaranteed to create a cart if one doesn't exist. Also returns cart if newly created, to avoid extra calls.

@@ -65,7 +65,7 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
         setError(true);
       } else {
         setCart(response.data);
-        router.refresh();
+        router.refresh(); // To update header cart value.
       }
       
     });

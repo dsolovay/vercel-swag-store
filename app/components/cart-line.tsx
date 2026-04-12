@@ -2,7 +2,7 @@
 
 import { Trash, Plus, Minus } from "lucide-react";
 import Image from "next/image";
-import { useState, useRef } from "react";import { Cart, CartItem } from "@/app/lib/types";
+import { useState } from "react";import { Cart, CartItem } from "@/app/lib/types";
 import { Price } from "@/app/components/Price";
 import Link from "next/link";
 import debounce from "lodash.debounce";
