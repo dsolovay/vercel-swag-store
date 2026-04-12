@@ -1,6 +1,6 @@
 "use client";
 
-import { addProductToCart } from "../lib/cart-server-actions";
+import { addProductToCart } from "../lib/server-actions";
 import { useFormStatus } from "react-dom";
 import { useEffect } from "react";
 import { useActionState } from "react";

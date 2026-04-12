@@ -7,7 +7,7 @@ import { useOptimistic, useState, startTransition } from "react";
 import {
   deleteProductFromCart,
   updateProductQuantity,
-} from "../lib/cart-server-actions"; 
+} from "../lib/server-actions"; 
 import { useRouter } from "next/navigation";
 
 function CopyCart(cart: Cart): Cart {
