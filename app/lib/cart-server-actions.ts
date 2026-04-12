@@ -25,92 +25,52 @@ export async function getCart(): Promise<ServiceResponse<Cart>> {
   return handleAndWrapResponse(cartResponse)  ;
 }
 
-export async function addProductToCart(productId: string, prevState: ServerActionResponse, formData: FormData): Promise<ServerActionResponse> {
 
-  const cartTokenResponse = await getCartToken();
+
+export async function addProductToCart(productId: string, prevState: ServerActionResponse, formData: FormData): Promise<ServerActionResponse> {   
   const quantity = Number(formData.get("quantity"));
-
-  try {
-    const result = await addToCart({ "productId": productId, "quantity": quantity, "cartToken": cartTokenResponse.cartToken });
-
-    if (result.success && result.data) {
-      return { state: "success" };
-    }
-
-    // Stale cart logic
-    if (result.statusCode === 404) {
-      const newCart = await getNewCartAndRefreshToken();
-      if (!newCart || newCart.success === false || !newCart.data?.token) {
-        console.error("Failed to create new cart after 404 response");
-        return { state: "error" };
-      }
-      const retryResult = await addToCart({ "productId": productId, "quantity": quantity, "cartToken": newCart.data.token });
-      if (retryResult.success && retryResult.data) {
-        console.log("Add to cart retry successful", retryResult);
-        return { state: "success" };
-      } else {
-        console.error("Failed to add to cart after retry", retryResult.statusCode, retryResult.error);
-        return { state: "error" };
-      }
-    }
-
-    // Handle other errors
-    console.error("Failed to add to cart", result.statusCode, result.error);
-    return { state: "error" };
-
-  } catch (error) {
-
-    console.error("Error adding product to cart:", error);
-    return { state: "error" };
-
-  }
+  const addToCartWithProductAndQuantity = (token: string) => addToCart({ "productId": productId, "quantity": quantity, "cartToken": token });
+  const response= await performCartAction(addToCartWithProductAndQuantity); 
+  return response.success ? { state: "success" } : { state: "error" }; 
 }
-// TODO naming convetion to make server functions easier to identify? E.g. prefix with "server" or "action" or something like that.
+
+
 export async function deleteProductFromCart(productId: string): Promise<ServiceResponse<Cart>> {
-  const cartTokenResponse = await getCartToken();
-  const response = await deleteCartLine({ "productId": productId, "cartToken": cartTokenResponse.cartToken });
-
-  if (response.statusCode === 404) {
-    console.warn("Cart not found when deleting cart line, returning freshly created cart.");
-    return await getNewCartAndRefreshToken();
-  }
-  
-  if (response.success === false || !response.data) {
-    console.error("Failed to delete cart line", response.statusCode, response.error);
-    return { success: false };
-  }
-
-  return {success: true, data: response.data};
+  const deleteProductWithToken = (token: string) => deleteCartLine({ "productId": productId, "cartToken": token });
+  const response = await performCartAction(deleteProductWithToken);
+  return response.success ? { success: true, data: response.data } : { success: false };
 }
+
 
 export async function updateProductQuantity(productId: string, quantity: number):Promise<ServiceResponse<Cart>> {
+  const updateQuantityWithToken = (token: string) => updateQuantity({ "productId": productId, "quantity": quantity, "cartToken": token });
+  return await performCartAction(updateQuantityWithToken);
+} 
+
+// Helper functions
+
+// action type defintion
+type cartDependentAction = (token: string) => Promise<ApiResponse<Cart>>;
+// local function
+async function performCartAction(action: cartDependentAction): Promise<ServiceResponse<Cart>> {
   const cartTokenResponse = await getCartToken();
-  const response = await updateQuantity({ "productId": productId, "quantity": quantity, "cartToken": cartTokenResponse.cartToken });
-
-  if (response.success) {
-    return { success: true, data: response.data };
+  const firstAttempt = await action(cartTokenResponse.cartToken);
+  if (firstAttempt.success) {
+    return {success: true, data: firstAttempt.data};
   }
-
-  if (response.statusCode === 404) {
-    console.warn("Cart not found when updating cart line, adding product to freshly created cart.");
-    const newCartResponse = await getNewCartAndRefreshToken();
-    if (!newCartResponse || newCartResponse.success === false || !newCartResponse.data?.token) {
-      console.error("Failed to create new cart after 404 response");
-      return { success: false}; 
-    };
-    const retryResponse = await updateQuantity({ "productId": productId, "quantity": quantity, "cartToken": newCartResponse.data?.token ?? "" });
-    if (retryResponse.success) {
-      console.log("Update quantity retry successful", retryResponse);
-      return  { success: true, data: retryResponse.data };
-    } else {
-      console.error("Failed to update quantity after retry", retryResponse.statusCode, retryResponse.error);
-      return { success: false };
+  if (firstAttempt.statusCode === 404) {
+    console.warn("Cart not found, creating new cart and retrying action.");
+    const secondAtttempt = await getNewCartAndRefreshToken();
+    if (secondAtttempt.success) {
+      return {success: true, data: secondAtttempt.data};
     }
-
+    console.warn("Failed to create new cart after 404, cannot perform cart action.", secondAtttempt.statusCode, secondAtttempt.error);
+    return { success: false };
   }
-  console.error("Failed to update cart line", response.statusCode, response.error);
+  console.warn("Cart action failed", firstAttempt.statusCode, firstAttempt.error);
   return { success: false };
 }
+
 
 /**
  * Helper method for evaluting responses, logging errors, and wrapping in the correct format.
