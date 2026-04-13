@@ -1,4 +1,4 @@
-import { getActivePromotion } from "@/app/lib/data";
+import { getActivePromotion } from "@/app/lib/server-actions";
 
 export default async function PromoBanner() {
   const promotion = await getActivePromotion();

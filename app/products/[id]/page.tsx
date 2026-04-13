@@ -1,14 +1,13 @@
-import { getProductAvailability, getProductDetails, getProducts } from "@/app/lib/data";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Price } from "@/app/components/Price";
 import { AddToCartButton } from "@/app/components/add-to-cart";
-
+import * as services from "@/app/lib/server-actions";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const {id} = await params;
-  const productDetails = await getProductDetails(id);
+  const productDetails = await services.getProductDetails(id);
   if (!productDetails.success || !productDetails.data) {
     return {
       title: "Product Not Found",
@@ -34,7 +33,10 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 } 
 
 async function StockInfo({ productId }: { productId: string }) {
-  const availabilityInfo = await getProductAvailability(productId);
+  const availabilityInfo = await services.getProductAvailability(productId);
+  if (!availabilityInfo.success || !availabilityInfo.data) {
+    return <p className="text-red-500">Failed to load stock info.</p>;
+  }
   const stock = availabilityInfo.data.stock;
   return (
     <>
@@ -54,7 +56,7 @@ export default async function ProductDetailPage({
 }) {
   
   const { id } = await params;
-  const productResponse = await getProductDetails(id);
+  const productResponse = await services.getProductDetails(id);
   if (!productResponse.success || !productResponse.data) {
     notFound();
   }
@@ -72,10 +74,10 @@ export default async function ProductDetailPage({
 }
 
 export async function generateStaticParams() {
-  const products = await getProducts();
+  const products = await services.getProducts({});
   if (!products.success || !products.data) {
     return [];
   }
-  return products.data.map((product) => ({ id: product.id }));
+  return products.data.products.map((product) => ({ id: product.id }));
 } 
 

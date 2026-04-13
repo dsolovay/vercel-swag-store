@@ -10,13 +10,19 @@ export type ApiResponse<TData, TMeta=undefined> = {
   };
 };
 
+type ServiceFailureResponse = {
+  success: false;
+}
+
+type ServiceSuccessResponse<TData> = {
+  success: true;
+  data: TData;
+}
 /**
  * For server actions. Error details are omitted.
  * */
-export type ServiceResponse<TData> = {
-  success: boolean;
-  data?: TData;
-}
+export type ServiceResponse<TData> = ServiceSuccessResponse<TData> | ServiceFailureResponse;
+
 // TODO Have a separate responses for server actions, to ensure error details are not exposed to client.
 
 export type Product = {
@@ -40,6 +46,11 @@ export type Pagination = {
   totalPages: number;
   hasNextPage: boolean;
   hasPreviousPage: boolean;
+};
+
+export type ProductsAndPagination = {
+  products: Product[];
+  pagination: Pagination;
 };
 
 export type Promotion = {

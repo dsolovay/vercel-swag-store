@@ -5,8 +5,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 import { ShoppingCart } from "lucide-react";
-import { getCart } from "./lib/data";
-import { cookies } from "next/headers";
+import * as serverActions from "@/app/lib/server-actions";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,16 +38,16 @@ async function Footer() {
 }
 
 async function CartQunantityBadge() {
-  const cookieStore = await cookies();
-  const cartToken = cookieStore.get("cart")?.value;
-  const cartResponse = cartToken ? await getCart(cartToken) : null;
 
-  const quantity =
-    cartResponse?.data?.items.reduce((acc, item) => acc + item.quantity, 0) ?? 0;
-
-  if (quantity === 0) {
+  // This component is allowed to contact data layer direclty, so that badge value can be cached.
+  const cartResponse = await serverActions.getCart();
+  if (!cartResponse.success || cartResponse.data?.items.length === 0) {
     return null;
   }
+
+  const quantity =
+    cartResponse.data?.items.reduce((acc, item) => acc + item.quantity, 0) ?? 0;
+ 
   return (
     <span
       className="inline-flex items-center justify-center rounded-full bg-blue-500 px-1 text-xs font-bold text-white
@@ -114,7 +113,7 @@ export default function RootLayout({
                 >
                   <ShoppingCart size={20} />
                   <Suspense fallback={<span className="sr-only"></span>}>
-                    <CartQunantityBadge />
+                    <CartQunantityBadge/>
                   </Suspense>
                   {/* TODO badge with number of items in cart */}
                 </Link>

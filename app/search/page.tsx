@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getProducts } from "@/app/lib/data";
+import { getProducts } from "@/app/lib/server-actions";
 import Image from "next/image";
 import Link from "next/link"
 import { Price } from "@/app/components/Price";
@@ -35,15 +35,15 @@ async function SearchResults({searchResultParams}: {searchResultParams: SearchRe
   const productResponse = await getProducts({page: 1, limit: 5, q: q ?? null, category: category ?? null, featured: false});
   if (!productResponse.success)   return <p className="text-red-500">Failed to load products.</p>;
 
-  const products = productResponse.data;
+  const productsAndPagination = productResponse.data;
 
-  if (!products || products.length === 0) {
+  if (!productsAndPagination || productsAndPagination.products.length === 0) {
     return <p className="text-gray-600 mt-4 ml-4">No products found.</p>;
   }
 
   return (
    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-      {products.map((product) => (
+      {productsAndPagination.products.map((product) => (
        
         <div key={product.id} className="border rounded p-4">
           <Link href={`/products/${product.id}`}>

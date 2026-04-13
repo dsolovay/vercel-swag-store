@@ -1,5 +1,10 @@
-
-
+/**
+ * 
+ * data.ts
+ * 
+ * This file contains all the functions that directly interact with the API. It is used by server-actions.ts, which contains the business logic for handling cart actions, including error handling and retries. By keeping this file focused solely on API interactions, we can ensure that all error handling and retries are done in server-actions.ts, and that the rest of the application can assume that all responses from server-actions.ts are successful, without having to worry about error scenarios or stale cart scenarios.
+ * API cache behavior is als defined here.
+ **/ 
 
 import "server-only";
 import { AvailabilityInfo, ApiResponse, Cart, Product, Pagination, Promotion } from "./types";
@@ -9,8 +14,10 @@ import { cacheLife, cacheTag } from "next/cache";
 // This ensures that error invformation is kept on the server.
 // All error handling is done in cart-server-actions, so that the rest of the application can assume all responses are successful, and not worry about error scenarios. If an error occurs, it is logged, and a failed response is returned, but no error details are included in the response. This is to prevent accidental exposure of sensitive information in error messages. The cart-server-actions file will also include logic for handling stale cart scenarios.
 
+if (!process.env.API_BASE_URL) {
+  console.warn("API_BASE_URL is not set. API requests will fail. Please set API_BASE_URL in your environment variables.");
+}
 const basePath = (process.env.API_BASE_URL ?? "").replace(/\/+$/, ""); // Remove trailing slashes
-// TODO - add error if not set
 
 async function doFetch<T,U = undefined>(path: string, options: RequestInit = {}): Promise<ApiResponse<T,U>> {
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
@@ -52,7 +59,6 @@ export async function getProducts(params: SearchProductParams = {}): Promise<Api
   if (params.featured) searchParms.append("featured", "true");
   if (params.category) searchParms.append("category", params.category);
  
-  // TODO - resolve type issue.
   return doFetch(`/products?${searchParms.toString()}`);
 }
 
