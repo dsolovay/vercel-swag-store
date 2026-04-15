@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
     - Make sure this handles delete lines, so that a cart update 
       doesn't replace a delete action. If these happen at the cart line level it
       might be okay. 
-    - Okay, not 100% sure abort controller is the way to go. 
+    - This can be done by defining actions at the cart line level, but having them invoked at the cart level.
 - Always show optimistic values, but give a visual indication to user if transitions are pending
 - Show errors to user.
 - Clamp quantity by available stock when product loads. 
