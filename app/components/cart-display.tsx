@@ -10,6 +10,20 @@ import {
 } from "../lib/server-actions"; 
 import { useRouter } from "next/navigation";
 
+/* Refactor notes:
+- Remove debounce logic.
+- Use useActionState and useOptimistic
+- Actions include Abort controller, so that queued actions can replace each other.
+    - Make sure this handles delete lines, so that a cart update 
+      doesn't replace a delete action. If these happen at the cart line level it
+      might be okay. 
+    - Okay, not 100% sure abort controller is the way to go. 
+- Always show optimistic values, but give a visual indication to user if transitions are pending
+- Show errors to user.
+- Clamp quantity by available stock when product loads. 
+   - Is this doable wihtout perf issues? 
+*/
+
 function CopyCart(cart: Cart): Cart {
   return {
     ...cart,
