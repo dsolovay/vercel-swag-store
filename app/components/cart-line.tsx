@@ -153,8 +153,7 @@ function QuantityControl({
   increment,
 }: {
   quantity: number;
-  decrement: () => void;
-  increment: () => void;
+  action: (qty: number) => void;
 }) {
   return (
     <div className="flex items-center gap-2 justify-end">

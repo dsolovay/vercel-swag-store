@@ -46,4 +46,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 - [ ] Consolidate 404 logic into a single abstraction.
 - [ ] Progressive enhancment: make all pages work without JavaScript enabled.
- 
+- [ ] Error boundary
