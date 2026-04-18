@@ -45,6 +45,10 @@ async function CartQunantityBadge() {
   }
 
   const quantity = cart.items.reduce((acc, item) => acc + item.quantity, 0) ?? 0;
+
+  if (quantity ===  0) {
+    return null;
+  }
  
   return (
     <span
