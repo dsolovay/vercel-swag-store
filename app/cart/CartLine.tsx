@@ -147,6 +147,8 @@ function decrement() {
 function increment() {
   quantityAction(quantity + 1);
 }
+
+// TODO Clamp on quantity at cart load.
  return (
    // TODO Improve appearance.
      <div className="relative flex items-center">

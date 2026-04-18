@@ -24,6 +24,7 @@ import { useRouter } from "next/navigation";
    - Is this doable wihtout perf issues? 
 */
 
+// TODO Load all available stock, pass to cart lines for clamping. Load stocks in parellel.
 function CopyCart(cart: Cart): Cart {
   return {
     ...cart,
