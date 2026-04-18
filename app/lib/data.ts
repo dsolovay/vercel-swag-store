@@ -112,6 +112,10 @@ export async function getCart(cartToken: string): Promise<ApiResponse<Cart>> {
 }
 
 export function deleteCartLine(data: { productId: string; cartToken: string }): Promise<ApiResponse<Cart>> {
+  if (process.env.SIMULATE_DELETE_ERROR === 'true') 
+  {
+    return new Promise((resolve) => setTimeout(() => resolve({ success: false, statusCode: 500 }), 2000));
+  }
   return doFetch(`/cart/${data.productId}`,
     {
       method: "DELETE",
@@ -122,7 +126,12 @@ export function deleteCartLine(data: { productId: string; cartToken: string }): 
 }
 
 
-export function updateQuantity(data: { productId: string; quantity: number; cartToken: string }): Promise<ApiResponse<Cart>> {
+export function updateQuantity(data: { productId: string; quantity: number; cartToken: string }): Promise<ApiResponse<Cart>> {  
+  if (process.env.SIMULATE_UPDATE_ERROR === 'true')
+  {
+    return new Promise((resolve) => setTimeout(() => resolve({ success: false, statusCode: 500 }), 2000));
+  }
+  
   return doFetch(`/cart/${data.productId}`,
     {
       method: "PATCH",

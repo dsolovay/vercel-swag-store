@@ -2,7 +2,7 @@
 
 import { Trash, Plus, Minus } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";import { Cart, CartItem } from "@/app/lib/types";
+import { Cart, CartItem } from "@/app/lib/types";
 import { Price } from "@/app/components/Price";
 import Link from "next/link";
 
@@ -54,9 +54,6 @@ export function CartLine({
   onDelete: (productId: string) => void;
   quantityAction: (productId: string, quantity: number) => void;
 }) {
-  const [localQty, setLocalQty] = useState(item.quantity);   
-
-  
 
   return (
     <>
@@ -71,7 +68,7 @@ export function CartLine({
                   <td className="w-24 text-sm text-gray-500 pr-3">Quantity:</td>
                   <td className="w-24">
                     <div className="flex justify-end">
-                      <QuantityControl quantity={localQty} quantityAction={(qty) => quantityAction(item.productId, qty)} />
+                      <QuantityControl quantity={item.quantity} quantityAction={(qty) => quantityAction(item.productId, qty)} />
                     </div>
                   </td>
                 </tr>
@@ -88,7 +85,7 @@ export function CartLine({
                   <td className="w-24 text-sm text-gray-500 pr-3">Total:</td>
                   <td className="w-24 text-right tabular-nums">
                     <Price
-                      price={item.product.price * localQty}
+                      price={item.product.price * item.quantity}
                       currency={item.product.currency}
                     />{" "}
                   </td>
@@ -116,7 +113,7 @@ export function CartLine({
         </td>
         <td className=" py-4 px-4">
           <QuantityControl
-            quantity={localQty}
+            quantity={item.quantity}
             quantityAction={(qty) => quantityAction(item.productId, qty)}
           />
         </td>
@@ -125,7 +122,7 @@ export function CartLine({
         </td>
         <td className="py-4 pl-4 text-right">
           <Price
-            price={item.product.price * localQty}
+            price={item.product.price * item.quantity}
             currency={item.product.currency}
           />
         </td>
@@ -151,18 +148,21 @@ function increment() {
   quantityAction(quantity + 1);
 }
  return (
-    <div className="flex items-center gap-2 justify-end">
-      <Minus
-        size={16}
-        className="text-gray-500 hover:text-red-500 transition-colors cursor-pointer"
-        onClick={decrement}
+   // TODO Improve appearance.
+     <div className="relative flex items-center">
+      <input
+      
+        name="quantity"
+        title="quantity"
+        type="number"
+        value={quantity}
+        onChange={(e) =>
+          quantityAction(Number(e.target.value))
+        }
+        className="pr-10 border rounded-1xl"
       />
-      <span className="w-6 text-center tabular-nums">{quantity}</span>
-      <Plus
-        size={16}
-        className="text-gray-500 hover:text-green-500 transition-colors cursor-pointer"
-        onClick={increment}
-      />
+
+    
     </div>
   );
 }

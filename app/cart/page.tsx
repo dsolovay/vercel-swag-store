@@ -1,7 +1,7 @@
 import { getOrCreateCart } from "@/app/lib/server-actions";
-import { CartDisplay } from "../components/cart-display";
+import { CartPage } from "./CartPage";
 
-export default async function CartPage() {
+export default async function Page() {
 
   const cartResponse =  await getOrCreateCart();
 
@@ -15,7 +15,7 @@ export default async function CartPage() {
   }
 
   return (
-      <CartDisplay success={cartResponse.success} data={cartResponse.data} />
+      <CartPage success={cartResponse.success} data={cartResponse.data} />
   );
 }
 
