@@ -90,8 +90,29 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
   //   });
   // }
 
-  function handleDelete(productId: string) {
-    // TODO Implement.
+  function handleDeleteAction(productId: string) {
+    startTransition(async() => {
+      console.log("handleDeleteAction", productId);
+      const cartUpdateCopy = CopyCart(optimisticCart);
+      const cartRollbackCopy = CopyCart(optimisticCart);
+      if (cartUpdateCopy.items.some(line => line.productId === productId))
+      {
+        cartUpdateCopy.items = cartUpdateCopy.items.filter(line => line.productId !== productId);
+      }
+      setOptimisticCart(cartUpdateCopy);
+      const response = await deleteProductFromCart(productId);
+      if (response.success)
+      {
+        router.refresh();
+      }
+      else 
+      {
+        setOptimisticCart(cartRollbackCopy);
+        setError(true);
+      }
+
+    });
+    
   }
 
   const  [optimisticCart, setOptimisticCart] = useOptimistic(cartProp.data);
@@ -146,7 +167,7 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
               <CartLine
                 key={item.productId}
                 item={item}
-                onDelete={handleDelete}
+                onDelete={handleDeleteAction}
                 quantityAction={handleQuantityAction}
               />
             ))}
