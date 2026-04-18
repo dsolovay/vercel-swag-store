@@ -85,30 +85,21 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
     });
   }
 
-  function handleQuantityChange(productId: string, quantity: number) {
-    setCart((prev) => ({
-      ...prev,
-      items: prev.items.map((i) =>
-        i.productId === productId ? { ...i, quantity } : i,
-      ),
-      subtotal: prev.items.reduce(
-        (sum, i) =>
-          sum + i.product.price * (i.productId === productId ? quantity : i.quantity),
-        0,
-      ),
-    }));
+   
+
+  function handleQuantityAction(productId: string, quantity: number) {
+    startTransition(async () => {
+      const response = await updateProductQuantity(productId, quantity);
+      if (!response.success || !response.data) {
+        setError(true);
+      } else {
+        setCart(response.data);
+        router.refresh();
+      }
+    });
   }
 
-  async function handleQuantitySettle(productId: string, quantity: number) {
-    const response = await updateProductQuantity(productId, quantity);
-    if (!response.success || !response.data) {
-      setError(true);
-    } else {
-      setCart(response.data);
-      router.refresh();
-    }
-  }
-
+   
   return (
     <div className="my-6">
       <h1 className="text-3xl font-bold mb-4">Your Cart</h1>
@@ -137,8 +128,7 @@ export function CartDisplay(cartProp: { success: boolean; data: Cart }) {
                 key={item.productId}
                 item={item}
                 onDelete={handleDelete}
-                onQuantityChange={handleQuantityChange}
-                onQuantitySettle={handleQuantitySettle}
+                quantityAction={handleQuantityAction}
               />
             ))}
           </tbody>

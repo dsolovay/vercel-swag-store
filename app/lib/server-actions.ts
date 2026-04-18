@@ -14,7 +14,21 @@ import { ServerActionResponse } from "./state";
 import { getCart as getCartApi } from "./data"; 
 import { ApiResponse, ServiceResponse, Cart, Product, AvailabilityInfo, ProductsAndPagination } from "./types";
 
-export async function getCart(): Promise<ServiceResponse<Cart>> {
+/**
+ * Does not create cart, so safe for server components like the header.
+ */
+export async function getCart(): Promise<Cart|null> {
+  const cookieStore = await cookies();
+  const cartToken = cookieStore.get("cart")?.value;
+  if (!cartToken){
+    return null;
+  }
+  const response = await api.getCart(cartToken);
+  return response.success ? response.data! : null;
+
+}
+
+export async function getOrCreateCart(): Promise<ServiceResponse<Cart>> {
   const cartTokenResponse = await getCartTokenOrCreateCart();
   if (cartTokenResponse.cartResponse?.data) {
     return {success:true, data: cartTokenResponse.cartResponse.data};    
@@ -93,6 +107,8 @@ async function doCartActionWithRetry(action: cartDependentAction): Promise<Servi
   console.warn("Cart action failed", firstAttempt.statusCode, firstAttempt.error);
   return { success: false };
 }
+
+
 
 
 /**

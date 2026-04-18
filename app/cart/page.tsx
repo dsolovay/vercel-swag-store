@@ -1,9 +1,9 @@
-import { getCart } from "@/app/lib/server-actions";
+import { getOrCreateCart } from "@/app/lib/server-actions";
 import { CartDisplay } from "../components/cart-display";
 
 export default async function CartPage() {
 
-  const cartResponse =  await getCart();
+  const cartResponse =  await getOrCreateCart();
 
   if (!cartResponse.success || cartResponse.data.items.length === 0) {
     return (

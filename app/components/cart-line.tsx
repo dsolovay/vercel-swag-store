@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useState } from "react";import { Cart, CartItem } from "@/app/lib/types";
 import { Price } from "@/app/components/Price";
 import Link from "next/link";
-import debounce from "lodash.debounce";
 
 function ImageAndDescription(item: CartItem) {
   return (
@@ -49,24 +48,15 @@ function RemoveButton({
 export function CartLine({
   item,
   onDelete,
-  onQuantityChange,
-  onQuantitySettle,
+  quantityAction
 }: {
   item: Cart["items"][number];
   onDelete: (productId: string) => void;
-  onQuantityChange: (productId: string, quantity: number) => void;
-  onQuantitySettle: (productId: string, quantity: number) => void;
+  quantityAction: (productId: string, quantity: number) => void;
 }) {
   const [localQty, setLocalQty] = useState(item.quantity);   
 
-  function changeQty(delta: 1 | -1) {
-    const next = Math.max(1, localQty + delta);
-    setLocalQty(next);
-    onQuantityChange(item.productId, next);
-    debounce(() => {
-      onQuantitySettle(item.productId, next);
-    }, 400)();
-  }
+  
 
   return (
     <>
@@ -81,7 +71,7 @@ export function CartLine({
                   <td className="w-24 text-sm text-gray-500 pr-3">Quantity:</td>
                   <td className="w-24">
                     <div className="flex justify-end">
-                      <QuantityControl quantity={localQty} decrement={() => changeQty(-1)} increment={() => changeQty(1)} />
+                      <QuantityControl quantity={localQty} quantityAction={(qty) => quantityAction(item.productId, qty)} />
                     </div>
                   </td>
                 </tr>
@@ -127,8 +117,7 @@ export function CartLine({
         <td className=" py-4 px-4">
           <QuantityControl
             quantity={localQty}
-            decrement={() => changeQty(-1)}
-            increment={() => changeQty(1)}
+            quantityAction={(qty) => quantityAction(item.productId, qty)}
           />
         </td>
         <td className="py-4 px-4 text-right">
@@ -149,13 +138,19 @@ export function CartLine({
 }
 function QuantityControl({
   quantity,
-  decrement,
-  increment,
+  quantityAction
 }: {
   quantity: number;
-  action: (qty: number) => void;
+  quantityAction: (qty: number) => void;
 }) {
-  return (
+function decrement() {
+  quantityAction(quantity - 1);
+}
+
+function increment() {
+  quantityAction(quantity + 1);
+}
+ return (
     <div className="flex items-center gap-2 justify-end">
       <Minus
         size={16}

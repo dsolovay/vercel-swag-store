@@ -37,16 +37,14 @@ async function Footer() {
   );
 }
 
-async function CartQunantityBadge() {
+async function CartQunantityBadge() { 
+  const cart = await serverActions.getCart();
 
-  // This component is allowed to contact data layer direclty, so that badge value can be cached.
-  const cartResponse = await serverActions.getCart();
-  if (!cartResponse.success || cartResponse.data?.items.length === 0) {
+  if (!cart) {
     return null;
   }
 
-  const quantity =
-    cartResponse.data?.items.reduce((acc, item) => acc + item.quantity, 0) ?? 0;
+  const quantity = cart.items.reduce((acc, item) => acc + item.quantity, 0) ?? 0;
  
   return (
     <span
