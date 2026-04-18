@@ -3,7 +3,7 @@
 import { Price } from "../components/Price";
 import { Cart } from "@/app/lib/types";
 import { CartLine } from "./CartLine";
-import { useOptimistic, useState, startTransition } from "react";
+import { useOptimistic, useState, startTransition , useActionState } from "react";
 import {
   deleteProductFromCart,
   updateProductQuantity,
@@ -11,21 +11,24 @@ import {
 import { useRouter } from "next/navigation";
 
 /* Refactor notes:
-- Remove debounce logic.
-- Use useActionState and useOptimistic
+- ✅ Remove debounce logic.  
+- ✅ Use useActionState and useOptimistic 
 - Actions include Abort controller, so that queued actions can replace each other.
     - Make sure this handles delete lines, so that a cart update 
       doesn't replace a delete action. If these happen at the cart line level it
       might be okay. 
     - This can be done by defining actions at the cart line level, but having them invoked at the cart level.
-- Always show optimistic values, but give a visual indication to user if transitions are pending
-- Show errors to user.
-- Clamp quantity by available stock when product loads. 
-   - Is this doable wihtout perf issues? 
+- ✅ Always show optimistic values, but give a visual indication to user if transitions are pending
+- ✅ Show errors to user.
+- Clamp quantity by available stock when product loads. Load stocks concurrently.   
 */
 
-// TODO Load all available stock, pass to cart lines for clamping. Load stocks in parellel.
-function CopyCart(cart: Cart): Cart {
+
+
+/**
+  * Make a deep copy for mutations.  
+  */
+function copyCart(cart: Cart): Cart {
   return {
     ...cart,
     items: cart.items.map((item) => ({
@@ -38,62 +41,92 @@ function CopyCart(cart: Cart): Cart {
 
 // For quantity, use useState, and debounce 400ms before updating the server.
 export function CartPage(cartProp: { success: boolean; data: Cart }) {   
-  {
-    /* Apply optimistic concurrency pattern from React docs. */
+
+  const {success, data} = cartProp;
+  
+  const initialCart = data;
+  const [error, setError] = useState(false);
+  const router =  useRouter();
+  const [cart, dispatchAction, isPending] = useActionState(updateCartAction, initialCart);
+  const [optimisticCart, setOptimisticCart] = useOptimistic(cart);
+  if (!success) {
+    return null; // TODO test to verify correct user display. Should we instead set error?
   }
 
-  const [error, setError] = useState(false);
-  //const [cart, setCart] = useState(cartProp.data);
-  const router =  useRouter();
-  
+  type QuantityChangePayload = {
+    type: "QUANTITY_CHANGE",
+    productId: string,
+    quantity: number
+  }
+  type RemoveLinePayload = {
+    type: "REMOVE_LINE",
+    productId: string
+  }
+
+  async function updateCartAction(prevCart: Cart, actionPayload: QuantityChangePayload | RemoveLinePayload): Promise<Cart> {
+
+    setError(false); // Reset error state on user action.
+
+    const cartCopy = copyCart(optimisticCart); // Is this necessary? Or can we use the `prevCart`?
+    switch (actionPayload.type) {
+      case 'QUANTITY_CHANGE': {
+       
+        const response = await updateProductQuantity(actionPayload.productId, actionPayload.quantity);
+
+        // Handle errors
+        if (!response.success) {
+          setError(true);
+          setOptimisticCart(prevCart);
+          return prevCart;
+        } else {
+          router.refresh();
+          return response.data;
+        }
+      }
+      case 'REMOVE_LINE': {
+        // Dispatch
+        const response = await deleteProductFromCart(actionPayload.productId);
+
+        // Handle errors
+        if (!response.success) {
+          setError(true);
+          setOptimisticCart(prevCart);
+          return prevCart;
+        } else {
+          router.refresh();
+          return response.data;
+        }
+      } 
+    }
+  }
  
 
-  function handleDeleteAction(productId: string) {
-    startTransition(async() => {
-      console.log("handleDeleteAction", productId);
-      const cartUpdateCopy = CopyCart(optimisticCart);
-      const cartRollbackCopy = CopyCart(optimisticCart);
-      if (cartUpdateCopy.items.some(line => line.productId === productId))
-      {
-        cartUpdateCopy.items = cartUpdateCopy.items.filter(line => line.productId !== productId);
-      }
-      setOptimisticCart(cartUpdateCopy);
-      const response = await deleteProductFromCart(productId);
-      if (response.success)
-      {
-        router.refresh();
-      }
-      else 
-      {
-        setOptimisticCart(cartRollbackCopy);
-        setError(true);
-      }
+    function handleDeleteAction(productId: string) {
+      startTransition(async () => {
+        const cartCopy = copyCart(optimisticCart);
 
-    });
-    
-  }
+        if (!cartCopy.items.some((c) => c.productId === productId)) return;
 
-  const  [optimisticCart, setOptimisticCart] = useOptimistic(cartProp.data);
+        cartCopy.items = cartCopy.items.filter(
+          (c) => c.productId !== productId,
+        );
+        setOptimisticCart(cartCopy);
+        dispatchAction({ type: "REMOVE_LINE", productId });
+      });
+    }
+
+  
 
   function handleQuantityAction(productId: string, quantity: number) {
     startTransition(async () => {
-      console.log("handleQuantityAction", productId, quantity);
-      const cartUpdateCopy = CopyCart(optimisticCart);
-      const cartRollbackCopy = CopyCart(optimisticCart);
-      const line = cartUpdateCopy.items.find(c => c.productId === productId);
-      if (line) {
-        line.quantity = quantity;
-        setOptimisticCart(cartUpdateCopy);
-        const response = await updateProductQuantity(productId, quantity);
-        if (response.success) {
-          setError(false);
-          router.refresh();
-        } 
-        else {
-          setError(true);
-          setOptimisticCart(cartRollbackCopy);
-        }
-      }
+      const cartCopy = copyCart(optimisticCart);
+      const lineToUpdate = cartCopy.items.find(line => line.productId === productId);
+        if (!lineToUpdate) {
+          return;
+        };
+      lineToUpdate.quantity = quantity;
+      setOptimisticCart(cartCopy);
+      dispatchAction({type:"QUANTITY_CHANGE", productId, quantity})
     });
   }
 
@@ -145,10 +178,15 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
                 Subtotal:
               </td>
               <td className="py-4 pl-4 text-right font-bold">
+                
+                {isPending ? // TODO Fix layout shift.
+                <text>Updating...🔁</text> :               
+               
                 <Price
                   price={optimisticCart.subtotal}
                   currency={optimisticCart.currency}
                 />
+}
               </td>
               <td className="py-4 pl-6" />
             </tr>
