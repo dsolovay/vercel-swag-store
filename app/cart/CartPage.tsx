@@ -46,49 +46,7 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
   //const [cart, setCart] = useState(cartProp.data);
   const router =  useRouter();
   
-  /* TODO Handle delete separately from optimistic logic.
-   * Prefer useSetAction.
-   */
-  // const [optimisticCart, optimisticDeleteRow] = useOptimistic(
-  //   cart,
-  //   (
-  //     currentCart: Cart,
-  //     action: {      
-  //       productId?: string;
-  //     },
-  //   ) => {
-      
-  //         const exists = currentCart.items.find(
-  //           (item) => item.productId === action.productId,
-  //         );
-  //         if (!exists) return currentCart;
-  //         const newCart = CopyCart(currentCart);
-  //         newCart.items = newCart.items.filter(
-  //           (item) => item.productId !== action.productId,
-  //         );
-  //         newCart.subtotal = newCart.items.reduce(
-  //           (acc, item) => acc + item.product.price * item.quantity,
-  //           0,
-  //         );
-  //         return newCart;
-  //       }
-    
-  // );
-
-  // function handleDelete(productId: string) {
-  //   console.log("deleting", productId);
-  //   startTransition(async () => {
-  //     optimisticDeleteRow({ productId });
-  //     const response = await deleteProductFromCart(productId);
-  //     if (!response.success || !response.data) {
-  //       setError(true);
-  //     } else {
-  //       setCart(response.data);
-  //       router.refresh(); // To update header cart value.
-  //     }
-      
-  //   });
-  // }
+ 
 
   function handleDeleteAction(productId: string) {
     startTransition(async() => {
