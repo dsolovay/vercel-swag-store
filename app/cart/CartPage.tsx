@@ -3,12 +3,13 @@
 import { Price } from "../components/Price";
 import { Cart } from "@/app/lib/types";
 import { CartLine } from "./CartLine";
-import { useOptimistic, useState, startTransition , useActionState } from "react";
+import { useOptimistic, useState, startTransition , useActionState, useRef } from "react";
 import {
   deleteProductFromCart,
   updateProductQuantity,
 } from "../lib/server-actions"; 
 import { useRouter } from "next/navigation";
+import { Contrail_One } from "next/font/google";
 
 /* Refactor notes:
 - ✅ Remove debounce logic.  
@@ -49,6 +50,10 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
   const router =  useRouter();
   const [cart, dispatchAction, isPending] = useActionState(updateCartAction, initialCart);
   const [optimisticCart, setOptimisticCart] = useOptimistic(cart);
+  const quantityAbortControllers = useRef(new Map<string, AbortController>());
+  const removeAbortControllers = useRef(new Map<string, AbortController>());
+
+
   if (!success) {
     return null; // TODO test to verify correct user display. Should we instead set error?
   }
@@ -56,23 +61,33 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
   type QuantityChangePayload = {
     type: "QUANTITY_CHANGE",
     productId: string,
-    quantity: number
+    quantity: number,
+    signal: AbortSignal
   }
   type RemoveLinePayload = {
     type: "REMOVE_LINE",
-    productId: string
+    productId: string,
+    // TODO Add abort signal here.
   }
 
   async function updateCartAction(prevCart: Cart, actionPayload: QuantityChangePayload | RemoveLinePayload): Promise<Cart> {
 
     setError(false); // Reset error state on user action.
-
-    const cartCopy = copyCart(optimisticCart); // Is this necessary? Or can we use the `prevCart`?
+    
     switch (actionPayload.type) {
       case 'QUANTITY_CHANGE': {
+        
+        if (actionPayload.signal.aborted) {
+          console.log(`[action] Skipping aborted request for ${actionPayload.productId}`);
+         return prevCart;
+         }
        
-        const response = await updateProductQuantity(actionPayload.productId, actionPayload.quantity);
+        const response = await updateProductQuantity(
+          actionPayload.productId, 
+          actionPayload.quantity        
+      );
 
+      
         // Handle errors
         if (!response.success) {
           setError(true);
@@ -119,6 +134,16 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
 
   function handleQuantityAction(productId: string, quantity: number) {
     startTransition(async () => {
+      
+      // If there is an abort controller for this product at this point,
+      // that means that a previous update is in flight, whice we should cancel.
+      const abortControllerForProduct = quantityAbortControllers.current.get(productId);
+      if (abortControllerForProduct)
+      {
+        console.log(`[cart] Aborting in-flight request for product ${productId}`);
+        abortControllerForProduct.abort();
+      }    
+
       const cartCopy = copyCart(optimisticCart);
       const lineToUpdate = cartCopy.items.find(line => line.productId === productId);
         if (!lineToUpdate) {
@@ -126,7 +151,12 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
         };
       lineToUpdate.quantity = quantity;
       setOptimisticCart(cartCopy);
-      dispatchAction({type:"QUANTITY_CHANGE", productId, quantity})
+      
+      // Create a new abort controller for this invocation.
+      const abortController = new AbortController();
+      console.log(`[cart] Dispatching quantity change: product=${productId}, qty=${quantity}`);
+      quantityAbortControllers.current.set(productId, abortController);
+      dispatchAction({type:"QUANTITY_CHANGE", productId, quantity, signal: abortController.signal});
     });
   }
 
@@ -180,7 +210,7 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
               <td className="py-4 pl-4 text-right font-bold">
                 
                 {isPending ? // TODO Fix layout shift.
-                <text>Updating...🔁</text> :               
+                <p>Updating...🔁</p> :               
                
                 <Price
                   price={optimisticCart.subtotal}

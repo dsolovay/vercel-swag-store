@@ -49,7 +49,7 @@ export async function deleteProductFromCart(productId: string): Promise<ServiceR
   return response.success ? { success: true, data: response.data } : { success: false };
 }
 
-export async function updateProductQuantity(productId: string, quantity: number):Promise<ServiceResponse<Cart>> {
+export async function updateProductQuantity(productId: string, quantity: number ):Promise<ServiceResponse<Cart>> {
   const updateQuantityWithToken = (token: string) => api.updateQuantity({ "productId": productId, "quantity": quantity, "cartToken": token });
   return await doCartActionWithRetry(updateQuantityWithToken);
 } 

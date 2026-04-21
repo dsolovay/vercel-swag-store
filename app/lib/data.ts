@@ -9,6 +9,7 @@
 import "server-only";
 import { AvailabilityInfo, ApiResponse, Cart, Product, Pagination, Promotion } from "./types";
 import { cacheLife, cacheTag } from "next/cache";
+import { sign } from "crypto";
 
 // This file wraps all API interactions. It is only called by cart-service-actions.
 // This ensures that error invformation is kept on the server.
