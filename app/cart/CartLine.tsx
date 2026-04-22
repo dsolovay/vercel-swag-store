@@ -2,9 +2,11 @@
 
 import { Trash, Plus, Minus } from "lucide-react";
 import Image from "next/image";
+import { useCallback } from "react";
 import { Cart, CartItem } from "@/app/lib/types";
 import { Price } from "@/app/components/Price";
 import Link from "next/link";
+
 
 function ImageAndDescription(item: CartItem) {
   return (
@@ -54,6 +56,8 @@ export function CartLine({
   onDelete: (productId: string) => void;
   quantityAction: (productId: string, quantity: number) => void;
 }) {
+  const productId = item.productId;
+  const handleQuantityChange = useCallback((qty: number) => quantityAction(productId, qty), [productId, quantityAction]);
 
   return (
     <>
@@ -68,7 +72,7 @@ export function CartLine({
                   <td className="w-24 text-sm text-gray-500 pr-3">Quantity:</td>
                   <td className="w-24">
                     <div className="flex justify-end">
-                      <QuantityControl quantity={item.quantity} quantityAction={(qty) => quantityAction(item.productId, qty)} />
+                      <QuantityControl quantity={item.quantity} quantityAction={handleQuantityChange} />
                     </div>
                   </td>
                 </tr>
@@ -114,7 +118,7 @@ export function CartLine({
         <td className=" py-4 px-4">
           <QuantityControl
             quantity={item.quantity}
-            quantityAction={(qty) => quantityAction(item.productId, qty)}
+            quantityAction={handleQuantityChange}
           />
         </td>
         <td className="py-4 px-4 text-right">
