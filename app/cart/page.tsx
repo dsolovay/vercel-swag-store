@@ -1,11 +1,11 @@
-import { getOrCreateCart, getProductAvailability } from "@/app/lib/server-actions";
+import { getCart, getProductAvailability } from "@/app/lib/server-actions";
 import { CartPage } from "./CartPage";
 
 export default async function Page() {
 
-  const cartResponse = await getOrCreateCart();
+  const cart = await getCart();
 
-  if (!cartResponse.success || cartResponse.data.items.length === 0) {
+  if (!cart || cart.items.length === 0) {
     return (
       <div className="my-6">
         <h1 className="text-3xl font-bold mb-4">Your Cart</h1>
@@ -14,7 +14,7 @@ export default async function Page() {
     );
   }
 
-  const productIds = cartResponse.data.items.map(item => item.productId);
+  const productIds = cart.items.map(item => item.productId);
   const stockEntries = await Promise.all(
     productIds.map(async id => {
       const response = await getProductAvailability(id);
@@ -24,7 +24,7 @@ export default async function Page() {
   const stockQuantities = new Map(stockEntries);
 
   return (
-    <CartPage success={cartResponse.success} data={cartResponse.data} stockQuantities={stockQuantities} />
+    <CartPage success={true} data={cart} stockQuantities={stockQuantities} />
   );
 }
 
