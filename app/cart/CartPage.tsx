@@ -172,6 +172,24 @@ export function CartPage(cartProp: { success: boolean; data: Cart; stockQuantiti
                 />
               </td>
             </tr>
+            {isPending && !error && (
+              <tr className="sm:hidden">
+                <td colSpan={5} className="py-1 text-center text-base text-gray-500">
+                  Processing... <RefreshCw className="inline-block w-4 h-4 ml-1 animate-spin" />
+                </td>
+              </tr>
+            )}
+            {error && (
+              <tr className="sm:hidden">
+                <td colSpan={5} className="py-4 pr-4 text-center font-bold text-red-500">
+                  An error occurred while updating the cart. Please{" "}
+                  <a href="/cart" className="inline-flex items-center gap-1 underline">
+                    refresh the page
+                  </a>{" "}
+                  and try again.
+                </td>
+              </tr>
+            )}
             <tr className="hidden sm:table-row border-t">
               <td colSpan={3} className="py-4 pr-4 text-right font-bold">
                 Subtotal:
@@ -184,20 +202,10 @@ export function CartPage(cartProp: { success: boolean; data: Cart; stockQuantiti
               </td>
               <td className="py-4 pl-6" />
             </tr>
-            {isPending && (
+            {isPending && !error && (
               <tr className="hidden sm:table-row">
                 <td colSpan={5} className="py-1 text-center text-base text-gray-500">
                   Processing... <RefreshCw className="inline-block w-4 h-4 ml-1 animate-spin" />
-                </td>
-              </tr>
-            )}
-            {error && (
-              <tr className="hidden sm:table-row">
-                <td
-                  colSpan={5}
-                  className="py-4 pr-4 text-center font-bold text-blue-500"
-                >
-                  Processing...🔁
                 </td>
               </tr>
             )}
