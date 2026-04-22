@@ -34,19 +34,43 @@ function copyCart(cart: Cart): Cart {
 export function CartPage(cartProp: { success: boolean; data: Cart }) {
   const { success, data } = cartProp;
 
+  /**
+   * `error` instructs user to refresh the cart page, so it's safe to leave the 
+   * in memory cart values visible.
+   */
   const [error, setError] = useState(false);
+
+  /**
+   * Router is used to force the header to redraw.
+   */
   const router = useRouter();
+
   const initialCart = data;
+  
+  /**
+   * servercart is the most recent cart returned from the API.
+   */
   const [serverCart, setServerCart] = useState(initialCart);
+
+  /**
+   * displayCart shows the result of user actions, to keep the UI fast.
+   */
   const [displayCart, setDisplayCart] = useState(initialCart);
 
   if (!success) {
     setError(true);
   }
 
+  /**
+   * isPending shows the user whether transactions have been posted to the server.
+   */
   const isPending = displayCart.subtotal != serverCart.subtotal;
 
-  const debouncedServerUpdate = useRef(
+  /**
+   * Allow users to quickly update quantity, but debounce submissions to speed response.
+   * UseRef allows the method to persiste over rerenders.
+   */
+  const debouncedServerQuantityUpdate = useRef(
     debounce((productId: string, qty: number) => {
       startTransition(async () => {
         const response = await updateProductQuantity(productId, qty);
@@ -60,6 +84,9 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
     }, 400)
   ).current;
 
+  /**
+   * Make sure it's persistent to avoid CartLine rerenders.
+   */
   const updateQuantity = useCallback((productId: string, qty: number) => {
     setDisplayCart(prev => {
       const cartCopy = copyCart(prev);
@@ -69,35 +96,35 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
         return prev;
       }
       productLine.quantity = qty;
-      cartCopy.subtotal = cartCopy.items.reduce(
-        (acc, item) => acc + item.product.price * item.quantity,
-        0,
-      );
+      updateCartTotals(cartCopy);
       return cartCopy;
     });
-    debouncedServerUpdate(productId, qty);
-  }, [debouncedServerUpdate]);
+    debouncedServerQuantityUpdate(productId, qty);
+  }, [debouncedServerQuantityUpdate]);
 
-  // async function removeProduct(productId: string, quantity: number) {
 
-  //     const cartCopy = copyCart(optimisticCart);
-  //     const lineToRemove = cartCopy.items.find(line => line.productId === productId);
-  //       if (!lineToRemove) {
-  //         return;
-  //       };
-  //     cartCopy.items = cartCopy.items.filter(line => line.productId !== productId);
-  //     cartCopy.subtotal = cartCopy.items.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
-  //     setOptimisticCart(cartCopy);
-  //     const response = await deleteProductFromCart(productId);
-  //     if (response.success) {
-  //       setServerCart(response.data);
-  //     }
-  //     else {
-  //       setError(true);
-  //     }
+  const removeCartLine = useCallback((productId: string) => {
+    setDisplayCart(prev => {
+      const cartCopy = copyCart(prev);
+      cartCopy.items = cartCopy.items.filter(line => line.productId !== productId);
+      updateCartTotals(cartCopy);
+      return cartCopy;
+    });
+    startTransition(async() => { 
+      const response = await deleteProductFromCart(productId);
+      if (!response.success) {
+        setError(true);
+        return;
+      }
+      else {
+        setServerCart(response.data);
+        router.refresh();
+      }
+     });
+    }, [router]);
+  
 
-  //   };
-
+ 
   return (
     <div className="my-6">
       <h1 className="text-3xl font-bold mb-4">Your Cart</h1>
@@ -125,7 +152,7 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
               <CartLine
                 key={item.productId}
                 item={item}
-                onDelete={deleteProductFromCart}
+                onDelete={removeCartLine}
                 quantityAction={updateQuantity}
               />
             ))}
@@ -179,3 +206,11 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
     </div>
   );
 }
+function updateCartTotals(cartCopy: Cart) {
+  cartCopy.subtotal = cartCopy.items.reduce(
+    (acc, item) => acc + item.product.price * item.quantity,
+    0
+  );
+  cartCopy.totalItems = cartCopy.items.reduce((acc, item) => acc + item.quantity, 0);
+}
+
