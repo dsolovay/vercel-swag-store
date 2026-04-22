@@ -49,10 +49,12 @@ function RemoveButton({
 
 export function CartLine({
   item,
+  stockQuantity,
   onDelete,
   quantityAction
 }: {
   item: Cart["items"][number];
+  stockQuantity: number;
   onDelete: (productId: string) => void;
   quantityAction: (productId: string, quantity: number) => void;
 }) {
@@ -72,7 +74,7 @@ export function CartLine({
                   <td className="w-24 text-sm text-gray-500 pr-3">Quantity:</td>
                   <td className="w-24">
                     <div className="flex justify-end">
-                      <QuantityControl quantity={item.quantity} quantityAction={handleQuantityChange} />
+                      <QuantityControl quantity={item.quantity} quantityAction={handleQuantityChange} stockQuantity={stockQuantity} />
                     </div>
                   </td>
                 </tr>
@@ -119,6 +121,7 @@ export function CartLine({
           <QuantityControl
             quantity={item.quantity}
             quantityAction={handleQuantityChange}
+            stockQuantity={stockQuantity}
           />
         </td>
         <td className="py-4 px-4 text-right">
@@ -137,19 +140,23 @@ export function CartLine({
     </>
   );
 }
+
 function QuantityControl({
   quantity,
-  quantityAction
+  quantityAction,
+  stockQuantity
 }: {
   quantity: number;
   quantityAction: (qty: number) => void;
+  stockQuantity: number;
 }) {
   return (
     <div className="inline-flex items-center border rounded-md overflow-hidden">
       <button
         type="button"
         onClick={() => quantityAction(quantity - 1)}
-        className="px-2 py-1 hover:bg-gray-100 transition-colors cursor-pointer"
+        disabled={quantity <= 1}
+        className="px-2 py-1 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
         aria-label="Decrease quantity"
       >
         <Minus size={14} />
@@ -158,14 +165,17 @@ function QuantityControl({
         name="quantity"
         title="quantity"
         type="number"
+        min={1}
+        max={stockQuantity}
         value={quantity}
-        onChange={(e) => quantityAction(Number(e.target.value))}
+        onChange={(e) => quantityAction(Math.min(Math.max(1, Number(e.target.value)), stockQuantity))}
         className="w-12 text-center border-x py-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
       <button
         type="button"
         onClick={() => quantityAction(quantity + 1)}
-        className="px-2 py-1 hover:bg-gray-100 transition-colors cursor-pointer"
+        disabled={quantity >= stockQuantity}
+        className="px-2 py-1 hover:bg-gray-100 transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed"
         aria-label="Increase quantity"
       >
         <Plus size={14} />

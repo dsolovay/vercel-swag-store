@@ -153,6 +153,7 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
             {displayCart.items.map((item) => (
               <CartLine
                 key={item.productId}
+                stockQuantity={10}
                 item={item}
                 onDelete={removeCartLine}
                 quantityAction={updateQuantity}
