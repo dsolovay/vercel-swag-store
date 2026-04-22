@@ -1,9 +1,9 @@
-import { getOrCreateCart } from "@/app/lib/server-actions";
+import { getOrCreateCart, getProductAvailability } from "@/app/lib/server-actions";
 import { CartPage } from "./CartPage";
 
 export default async function Page() {
 
-  const cartResponse =  await getOrCreateCart();
+  const cartResponse = await getOrCreateCart();
 
   if (!cartResponse.success || cartResponse.data.items.length === 0) {
     return (
@@ -14,8 +14,17 @@ export default async function Page() {
     );
   }
 
+  const productIds = cartResponse.data.items.map(item => item.productId);
+  const stockEntries = await Promise.all(
+    productIds.map(async id => {
+      const response = await getProductAvailability(id);
+      return [id, response.success ? response.data.stock : 0] as const;
+    })
+  );
+  const stockQuantities = new Map(stockEntries);
+
   return (
-      <CartPage success={cartResponse.success} data={cartResponse.data} />
+    <CartPage success={cartResponse.success} data={cartResponse.data} stockQuantities={stockQuantities} />
   );
 }
 

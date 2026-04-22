@@ -17,6 +17,7 @@ import {
 } from "../lib/server-actions";
 import debounce from "lodash.debounce";
 import { useRouter } from "next/navigation";
+import * as api from "../lib/data";
 
 /**
   * Make a deep copy for mutations.  
@@ -33,8 +34,8 @@ function copyCart(cart: Cart): Cart {
 }
 
 // For quantity, use useState, and debounce 400ms before updating the server.
-export function CartPage(cartProp: { success: boolean; data: Cart }) {
-  const { success, data } = cartProp;
+export function CartPage(cartProp: { success: boolean; data: Cart; stockQuantities: Map<string, number> }) {
+  const { success, data, stockQuantities } = cartProp;
 
   /**
    * `error` instructs user to refresh the cart page, so it's safe to leave the 
@@ -104,7 +105,9 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
     debouncedServerQuantityUpdate(productId, qty);
   }, [debouncedServerQuantityUpdate]);
 
-
+  /**
+   * removeCartLine doesn't need to be debounced, as the line disappears as soon as this is clicked.
+   */
   const removeCartLine = useCallback((productId: string) => {
     setDisplayCart(prev => {
       const cartCopy = copyCart(prev);
@@ -126,7 +129,6 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
     }, [router]);
   
 
- 
   return (
     <div className="my-6">
       <h1 className="text-3xl font-bold mb-4">Your Cart</h1>
@@ -153,7 +155,7 @@ export function CartPage(cartProp: { success: boolean; data: Cart }) {
             {displayCart.items.map((item) => (
               <CartLine
                 key={item.productId}
-                stockQuantity={10}
+                stockQuantity={stockQuantities.get(item.productId) ?? 0}
                 item={item}
                 onDelete={removeCartLine}
                 quantityAction={updateQuantity}
