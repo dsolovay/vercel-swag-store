@@ -51,3 +51,4 @@ documented [here](https://react.dev/reference/react/useTransition#perform-non-bl
     - Need clarity on sequencing issues as described [here](https://react.dev/reference/react/useTransition#my-state-updates-in-transitions-are-out-of-order).
 - [ ] Progressive enhancment: make all pages work without JavaScript enabled.
 - [ ] Error boundary
+- [ ] Bug: Going from home to cart errors (invalid create cart) if nothing in cart.
