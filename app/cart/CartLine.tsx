@@ -144,31 +144,32 @@ function QuantityControl({
   quantity: number;
   quantityAction: (qty: number) => void;
 }) {
-function decrement() {
-  quantityAction(quantity - 1);
-}
-
-function increment() {
-  quantityAction(quantity + 1);
-}
-
-// TODO Clamp on quantity at cart load.
- return (
-   // TODO Improve appearance.
-     <div className="relative flex items-center">
+  return (
+    <div className="inline-flex items-center border rounded-md overflow-hidden">
+      <button
+        type="button"
+        onClick={() => quantityAction(quantity - 1)}
+        className="px-2 py-1 hover:bg-gray-100 transition-colors cursor-pointer"
+        aria-label="Decrease quantity"
+      >
+        <Minus size={14} />
+      </button>
       <input
-      
         name="quantity"
         title="quantity"
         type="number"
         value={quantity}
-        onChange={(e) =>
-          quantityAction(Number(e.target.value))
-        }
-        className="pr-10 border rounded-1xl"
+        onChange={(e) => quantityAction(Number(e.target.value))}
+        className="w-12 text-center border-x py-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
       />
-
-    
+      <button
+        type="button"
+        onClick={() => quantityAction(quantity + 1)}
+        className="px-2 py-1 hover:bg-gray-100 transition-colors cursor-pointer"
+        aria-label="Increase quantity"
+      >
+        <Plus size={14} />
+      </button>
     </div>
   );
 }
