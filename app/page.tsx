@@ -3,6 +3,11 @@ import FeaturedProducts from "./components/FeaturedProduct";
 import Hero from "@/app/components/Hero";
 
 export default function Home() {
+  
+  if (process.env.SIMULATE_HOME_EXCEPTION?.toLowerCase() === "true") {
+    throw new Error("Test error thrown from Home page.");
+  }
+  
   return (
     <div className="my-6">
       <PromoBanner />
