@@ -23,6 +23,11 @@ export function PaginationControl({ page, totalPages }: { page: number; totalPag
         variant="outlined"
         shape="rounded"
         onChange={onChangeHandler}
+        sx={{'& .MuiPaginationItem-root.Mui-selected': {
+          backgroundColor: "#ededed",
+          color: "#0a0a0a",
+          borderColor: "#ededed",
+        }}}        
         />
     </div>
   );
