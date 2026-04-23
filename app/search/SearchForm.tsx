@@ -58,7 +58,7 @@ export function SearchForm() {
   }
 
   return (
-    <form className="px-4 py-4" onSubmit={onSubmit}>
+    <form className="px-4 py-4 max-w-lg" onSubmit={onSubmit}>
       <label
         htmlFor="category"
         className="block text-sm font-medium text-gray-700 mb-1"
