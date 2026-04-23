@@ -32,6 +32,21 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
   };
 } 
 
+function StockInfoSkeleton() {
+  return (
+    <div className="my-4 space-y-3">
+      {/* stock text placeholder */}
+      <div className="relative overflow-hidden h-5 w-32 rounded bg-gray-200">
+        <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/60 to-transparent animate-shimmer" />
+      </div>
+      {/* button placeholder */}
+      <div className="relative overflow-hidden h-10 w-36 rounded bg-gray-200">
+        <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/60 to-transparent animate-shimmer" />
+      </div>
+    </div>
+  );
+}
+
 async function StockInfo({ productId }: { productId: string }) {
   const availabilityInfo = await services.getProductAvailability(productId);
   if (!availabilityInfo.success || !availabilityInfo.data) {
@@ -66,7 +81,7 @@ export default async function ProductDetailPage({
       <h1 className="text-2xl font-bold">{productResponse.data.name}</h1>
       <p>{productResponse.data.description}</p>
       <Price price={productResponse.data.price} currency={productResponse.data.currency} />
-      <Suspense fallback={<p>Loading real-time stock info...</p>}>
+      <Suspense fallback={<StockInfoSkeleton />}>
         <StockInfo productId={id} />
       </Suspense>
     </div>
