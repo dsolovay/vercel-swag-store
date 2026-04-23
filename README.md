@@ -1,67 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dan Solovay's Vercel Certifcation Exercise
 
-## Getting Started
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Running Locally
+
+Set these environment values based on information avaiable in the assignment.
+
+API_BASE_URL
+VERCEL_PROTECTION_BYPASS
+
+Then `pnpm dev` to view at localhost:3000.
+
+Use `pnpm build` to confirm build process is clean.
+
+## Publically accessing
+
+Site: https://vercel-swag-store-ten.vercel.app/
+Repo: https://github.com/dsolovay/vercel-swag-store
+
+## Things that work well
+
+- Cart is snappy. Quantity updates and deletes are instant, and the user gets a clear indication that backend processing is still happening.
+- Mobile design is clean and functional.
+- Cart errors are handled well.
+- Cart state is shown on badge, that has a clean professional look.
+
+## Testing suggestions
+
+- I've created environment variables to force error states, such as SIMULATE_DELETE_ERROR and SIMULATE_UPDATE_ERROR. These can be used to force
+the cart error state.
+- You can manually change a cart cooke in dev tools.to force the 404 logic.
+
+## Things to improve
+
+- The pagination doesn't inform the user that a search is in flight. This could get fixed by using a tansition, and passing the
+is pending state to the search page.
+- There's a reload of both the cart page when you empty it, and of the product detail page when you add an item, that is not as 
+polished as I'd like. Neither is that jarring however.
+- I never got to adding the Art Direction image behavior on the home page.
+- I had the ambition of making this whole thing work without JS enabled on the browser. It's doable with a bit more rigor on the use of actions.
+
+
+## Where I used AI
+
+- Most of the tailwind, and designing loading skins.
+- Helping me get out of a deep scary hole with cart state. My initial implementation showed a series of changing values. 
+Then I tried using AbortController (based on React.dev docs), only to find out it's not supported by Server Actions. 
+I finally landed on the pattern of having cart state be local, and showing in progress state by checking when returned
+cart's total matched local. But I needed the AI to figure out some of the React details, like when to use `useRef` and 
+when to `useCallback`. 
+- Adding the Pagination controller. This seemed like something I could completely wrap my head around and could build an ugly one on 
+my own. I decided to use AI to speed the integration of using MuiMaterials. The bot also had to explain to me that I couldn't put
+a pager on a server component, for obvious reasons--it needs to deal with user clicks. 
+- Also, because I can't resist a moment of meta:
+
 ```
+Q: Don't edit. But are there any repetitive points in this README?
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+A: Yes, one clear overlap: the AbortController/Server Actions discovery is mentioned in both sections.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+"Where I used AI": "Then I tried using AbortController (based on React.dev docs), only to find out it's not supported by Server Actions."
+"Where I did not use AI": "...and then I found out I couldn't send abort signals to ServerActions."
+The same realization is recounted twice. The first is part of the cart state narrative; the second is framed around the late-night reading session — but they're describing the same dead end.
+```
+I don't care Claude. It was an emotional moment for me. 
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Where I did not use AI
 
-## Learn More
+- I'm pretty sure all the work of getting my API layer clean, and consolidating all the 404 logic into a clean abstraction, was
+entirely Dan. I love nuts and bolts coding, and I miss the fact I don't get to do it anymore. "Find the missing abstrction!" as Mark Seemann
+said in a SOLID course I took way back when. I got super fussy about keeping all the data.js components away from the client to avoid
+leaking error messages, but didn't push that through everywhere, so for example Search calls the API layer directly. But you can see where I
+was going with `APiResponse` vs `SericeResponse` (the latter contains no error details).
+- The general approach to cart state--trusting local as the source of truth.
+- The approach to error handling. setError(true) worked really cleanly. I _think_ I came up with that, based on reading a lot
+of React docs.  (I might have seen it in your course material though. I looked at a *lot* of examples.)
+- Reading the `useActionState` React docs on a Tuesday night until well past midnight, trying to wrap my brain around how `startTransition`,
+`useOptimistic`, and `AbortController` worked.  There was an 'aha!' moment when I thought I really had this, and then I found out I couldn't
+send abort signals to ServerActions. 
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-
-## Vercel Exercise
-
-### Implemented Features
-
-* Handle stale cart cookies. You can verify by manually modifying a cookie. Terminal messages indicate that a new cart is generated.
-
-### To do items
-
-- [x] Consolidate 404 logic into a single abstraction.
-- [x] Simplify handling of cart updates, with useTransition as
-documented [here](https://react.dev/reference/react/useTransition#perform-non-blocking-updates-with-actions).
-    - Per documentation, transitions can be used with useOptimistic.
-    - Need clarity on sequencing issues as described [here](https://react.dev/reference/react/useTransition#my-state-updates-in-transitions-are-out-of-order).
-- [ ] ~Progressive enhancment: make all pages work without JavaScript enabled.~ (Outside of assignment scope.)
-- [ ] Error boundary
-- [x] Bug: Going from home to cart errors (invalid create cart) if nothing in cart.
-- [x] Feature: Add pagination to search.
-    - [x] Add standard paging control.
-    - [x] Ensure page set to 1 on facet change.
-- [ ] Fix jank
-    - [ ] Empty cart should settle on one state.
-- [x] Use loading circle in Add to Cart button.
-- [ ] Add product search images.
-- [x] Add Cart loading skeleton.
-- [X] Add search loading skeleton.
-- [x] PDP Stock info loading skeleton.
-
-
-
+## Thanks
+This was a great exercise, and greatly solidified my knowlwedg of Vercel, Next.js, TS and JS. Thanks for the chance to take part!
