@@ -22,13 +22,37 @@ export default async function Search({searchParams}: {searchParams: SearchResult
         <SearchForm  />
       </Suspense>
        
-      <Suspense fallback={<p>TODO: Loading Skelton</p>}>
+      <Suspense fallback={<SearchResultsSkeleton />}>
         <SearchResults searchResultParams={searchParams} />         
       </Suspense>
     </div>
   );
 }
  
+
+function ShimmerBar({ className }: { className?: string }) {
+  return (
+    <div className={`relative overflow-hidden rounded bg-gray-200 ${className ?? ""}`}>
+      <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/60 to-transparent animate-shimmer" />
+    </div>
+  );
+}
+
+function SearchResultsSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="border rounded p-4 space-y-3">
+          <ShimmerBar className="h-5 w-3/4" />
+          <ShimmerBar className="h-4 w-full" />
+          <ShimmerBar className="h-4 w-5/6" />
+          <ShimmerBar className="h-48 w-full mt-2" />
+          <ShimmerBar className="h-5 w-20" />
+        </div>
+      ))}
+    </div>
+  );
+}
 
 async function SearchResults({searchResultParams}: {searchResultParams: SearchResultsProps}) {
   const {q, category, page: pageParam } = await searchResultParams;
@@ -49,7 +73,7 @@ async function SearchResults({searchResultParams}: {searchResultParams: SearchRe
   if (!productsAndPagination || productsAndPagination.products.length === 0) {
     return <p className="text-gray-600 mt-4 ml-4">No products found.</p>;
   }
-  
+
   return (
     <>
       <SearchGrid products={productsAndPagination.products} />

@@ -52,7 +52,7 @@ documented [here](https://react.dev/reference/react/useTransition#perform-non-bl
 - [ ] ~Progressive enhancment: make all pages work without JavaScript enabled.~ (Outside of assignment scope.)
 - [ ] Error boundary
 - [x] Bug: Going from home to cart errors (invalid create cart) if nothing in cart.
-- [ ] Feature: Add pagination to search.
+- [x] Feature: Add pagination to search.
     - [x] Add standard paging control.
     - [x] Ensure page set to 1 on facet change.
 - [ ] Fix jank
@@ -60,6 +60,7 @@ documented [here](https://react.dev/reference/react/useTransition#perform-non-bl
 - [x] Use loading circle in Add to Cart button.
 - [ ] Add product search images.
 - [x] Add Cart loading skeleton.
+- [X] Add search loading skeleton.
 - [x] PDP Stock info loading skeleton.
 
 
