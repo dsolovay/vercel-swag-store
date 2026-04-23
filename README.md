@@ -1,10 +1,10 @@
-# Dan Solovay's Vercel Certifcation Exercise
+# Dan Solovay's Vercel Certification Exercise
 
 
 
 ## Running Locally
 
-Set these environment values based on information avaiable in the assignment.
+Set these environment values based on information available in the assignment.
 
 API_BASE_URL
 VERCEL_PROTECTION_BYPASS
@@ -15,7 +15,7 @@ Use `pnpm build` to confirm build process is clean.
 
 ## Publically accessing
 
-Site: https://vercel-swag-store-ten.vercel.app/
+Site: https://vercel-swag-store-ten.vercel.app/  
 Repo: https://github.com/dsolovay/vercel-swag-store
 
 ## Things that work well
@@ -29,11 +29,11 @@ Repo: https://github.com/dsolovay/vercel-swag-store
 
 - I've created environment variables to force error states, such as SIMULATE_DELETE_ERROR and SIMULATE_UPDATE_ERROR. These can be used to force
 the cart error state.
-- You can manually change a cart cooke in dev tools.to force the 404 logic.
+- You can manually change a cart cookie in dev tools.to force the 404 logic.
 
 ## Things to improve
 
-- The pagination doesn't inform the user that a search is in flight. This could get fixed by using a tansition, and passing the
+- The pagination doesn't inform the user that a search is in flight. This could get fixed by using a transition, and passing the
 is pending state to the search page.
 - There's a reload of both the cart page when you empty it, and of the product detail page when you add an item, that is not as 
 polished as I'd like. Neither is that jarring however.
@@ -68,10 +68,10 @@ I don't care Claude. It was an emotional moment for me.
 ## Where I did not use AI
 
 - I'm pretty sure all the work of getting my API layer clean, and consolidating all the 404 logic into a clean abstraction, was
-entirely Dan. I love nuts and bolts coding, and I miss the fact I don't get to do it anymore. "Find the missing abstrction!" as Mark Seemann
+entirely Dan. I love nuts and bolts coding, and I miss the fact I don't get to do it anymore. "Find the missing abstraction!" as Mark Seemann
 said in a SOLID course I took way back when. I got super fussy about keeping all the data.js components away from the client to avoid
 leaking error messages, but didn't push that through everywhere, so for example Search calls the API layer directly. But you can see where I
-was going with `APiResponse` vs `SericeResponse` (the latter contains no error details).
+was going with `APiResponse` vs `ServiceResponse` (the latter contains no error details).
 - The general approach to cart state--trusting local as the source of truth.
 - The approach to error handling. setError(true) worked really cleanly. I _think_ I came up with that, based on reading a lot
 of React docs.  (I might have seen it in your course material though. I looked at a *lot* of examples.)
@@ -80,4 +80,4 @@ of React docs.  (I might have seen it in your course material though. I looked a
 send abort signals to ServerActions. 
 
 ## Thanks
-This was a great exercise, and greatly solidified my knowlwedg of Vercel, Next.js, TS and JS. Thanks for the chance to take part!
+This was a great exercise, and greatly solidified my knowledge of Vercel, Next.js, TS and JS. Thanks for the chance to take part!
