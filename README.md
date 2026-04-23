@@ -57,7 +57,7 @@ documented [here](https://react.dev/reference/react/useTransition#perform-non-bl
     - [x] Ensure page set to 1 on facet change.
 - [ ] Fix jank
     - [ ] Empty cart should settle on one state.
-- [ ] Use loading circle in Add to Cart button.
+- [x] Use loading circle in Add to Cart button.
 - [ ] Add product search images.
 - [ ] Add Cart loading skeleton.
 - [x] PDP Stock info loading skeleton.

@@ -1,6 +1,7 @@
 "use client";
 
 import { addProductToCart } from "../lib/server-actions";
+import { RefreshCw } from "lucide-react";
 import { useFormStatus } from "react-dom";
 import { useEffect } from "react";
 import { useActionState } from "react";
@@ -16,7 +17,11 @@ function SubmitButton({ stock }: { stock: number }) {
       disabled={stock <= 0 || pending}
       className="bg-blue-600 text-white rounded-lg px-4 py-2 ml-2 hover:bg-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
     >
-      {pending ? "Adding..." : "Add to Cart"}
+      {pending ? (
+        <>
+          Adding... <RefreshCw className="inline-block w-4 h-4 ml-1 animate-spin" />
+        </>
+      ) : "Add to Cart"}
     </button>
   );
 }
