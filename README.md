@@ -45,10 +45,16 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 ### To do items
 
 - [x] Consolidate 404 logic into a single abstraction.
-- [ ] Simplify handling of cart updates, with useTransition as
+- [x] Simplify handling of cart updates, with useTransition as
 documented [here](https://react.dev/reference/react/useTransition#perform-non-blocking-updates-with-actions).
     - Per documentation, transitions can be used with useOptimistic.
     - Need clarity on sequencing issues as described [here](https://react.dev/reference/react/useTransition#my-state-updates-in-transitions-are-out-of-order).
-- [ ] Progressive enhancment: make all pages work without JavaScript enabled.
+- [ ] ~Progressive enhancment: make all pages work without JavaScript enabled.~ (Outside of assignment scope.)
 - [ ] Error boundary
 - [x] Bug: Going from home to cart errors (invalid create cart) if nothing in cart.
+- [ ] Feature: Add pagination to search.
+    - [ ] Add paging to API.
+    - [ ] Calculate pages for facets, show on page.
+    - [ ] Add standard paging control.
+    - [ ] Ensure page set to 1 on facet change.
+
