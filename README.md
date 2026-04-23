@@ -52,18 +52,26 @@ when to `useCallback`.
 - Adding the Pagination controller. This seemed like something I could completely wrap my head around and could build an ugly one on 
 my own. I decided to use AI to speed the integration of using MuiMaterials. The bot also had to explain to me that I couldn't put
 a pager on a server component, for obvious reasons--it needs to deal with user clicks. 
+- I ran this prompt, which caught the fact I was missing metadata on towo pages:
+  ```
+  You are a coach, whose job it is to make sure I've compleled an assignment correctly.
+
+  I will give you the text of the assignment. Please make a short list of requirements I missed based on reading the code base. Mark each High, Medium, Low severity, and put them in a table.
+  ```  
+  Noteably, this was for review and planning. Fixing the gaps is on me.  
+
 - Also, because I can't resist a moment of meta:
 
-```
-Q: Don't edit. But are there any repetitive points in this README?
+    ```
+    Q: Don't edit. But are there any repetitive points in this README?
 
-A: Yes, one clear overlap: the AbortController/Server Actions discovery is mentioned in both sections.
+    A: Yes, one clear overlap: the AbortController/Server Actions discovery is mentioned in both sections.
 
-"Where I used AI": "Then I tried using AbortController (based on React.dev docs), only to find out it's not supported by Server Actions."
-"Where I did not use AI": "...and then I found out I couldn't send abort signals to ServerActions."
-The same realization is recounted twice. The first is part of the cart state narrative; the second is framed around the late-night reading session — but they're describing the same dead end.
-```
-I don't care Claude. It was an emotional moment for me. 
+    "Where I used AI": "Then I tried using AbortController (based on React.dev docs), only to find out it's not supported by Server Actions."
+    "Where I did not use AI": "...and then I found out I couldn't send abort signals to ServerActions."
+    The same realization is recounted twice. The first is part of the cart state narrative; the second is framed around the late-night reading session — but they're describing the same dead end.
+    ```
+    I don't care Claude. It was an emotional moment for me. 
 
 ## Where I did not use AI
 
