@@ -53,10 +53,8 @@ documented [here](https://react.dev/reference/react/useTransition#perform-non-bl
 - [ ] Error boundary
 - [x] Bug: Going from home to cart errors (invalid create cart) if nothing in cart.
 - [ ] Feature: Add pagination to search.
-    - [ ] Add paging to API.
-    - [ ] Calculate pages for facets, show on page.
-    - [ ] Add standard paging control.
-    - [ ] Ensure page set to 1 on facet change.
+    - [x] Add standard paging control.
+    - [x] Ensure page set to 1 on facet change.
 - [ ] Fix jank
     - [ ] Empty cart should settle on one state.
 - [ ] Use loading circle in Add to Cart button.

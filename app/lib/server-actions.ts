@@ -73,7 +73,7 @@ export async function getProductAvailability(productId: string): Promise<Service
 export async function getProducts(params: api.SearchProductParams): Promise<ServiceResponse<ProductsAndPagination>> {
   const response = await api.getProducts(params);
   if (response.success && response.data && response.meta) {
-    return {success: true, data: { products: response.data, pagination: response.meta }};
+    return {success: true, data: { products: response.data, pagination: response.meta.pagination }};
   }
   else return {success: false};  
 }

@@ -31,6 +31,7 @@ export function SearchForm() {
     if (category !== undefined) {
       newParams.set("category", category);
     }
+    newParams.set("page", "1");
     router.push(
       `/search?${newParams.toString()}`,
     );

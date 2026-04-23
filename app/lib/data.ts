@@ -49,7 +49,7 @@ export type SearchProductParams = {
   category?: string | null;
 }
 
-export async function getProducts(params: SearchProductParams = {}): Promise<ApiResponse<Product[], Pagination>> {
+export async function getProducts(params: SearchProductParams = {}): Promise<ApiResponse<Product[], {pagination: Pagination}>> {
   "use cache";
   cacheLife("minutes");
 
@@ -113,7 +113,7 @@ export async function getCart(cartToken: string): Promise<ApiResponse<Cart>> {
 }
 
 export function deleteCartLine(data: { productId: string; cartToken: string }): Promise<ApiResponse<Cart>> {
-  if (process.env.SIMULATE_DELETE_ERROR === 'true') 
+  if (process.env.SIMULATE_DELETE_ERROR?.toLowerCase() === 'true') 
   {
     return new Promise((resolve) => setTimeout(() => resolve({ success: false, statusCode: 500 }), 2000));
   }
@@ -128,7 +128,7 @@ export function deleteCartLine(data: { productId: string; cartToken: string }): 
 
 
 export function updateQuantity(data: { productId: string; quantity: number; cartToken: string }): Promise<ApiResponse<Cart>> {  
-  if (process.env.SIMULATE_UPDATE_ERROR === 'true')
+  if (process.env.SIMULATE_UPDATE_ERROR?.toLowerCase() === 'true')
   {
     return new Promise((resolve) => setTimeout(() => resolve({ success: false, statusCode: 500 }), 2000));
   }
