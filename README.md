@@ -59,7 +59,7 @@ documented [here](https://react.dev/reference/react/useTransition#perform-non-bl
     - [ ] Empty cart should settle on one state.
 - [x] Use loading circle in Add to Cart button.
 - [ ] Add product search images.
-- [ ] Add Cart loading skeleton.
+- [x] Add Cart loading skeleton.
 - [x] PDP Stock info loading skeleton.
 
 
