@@ -2,7 +2,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { Price } from "@/app/components/Price";
-import { AddToCartButton } from "@/app/components/add-to-cart";
+import { AddToCartButton } from "@/app/components/AddToCart";
 import * as services from "@/app/lib/server-actions";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {

@@ -1,6 +1,6 @@
-import Hero from "@/app/components/hero";
 import PromoBanner from "./components/promo-banner";
-import FeaturedProducts from "./components/featured-products";
+import FeaturedProducts from "./components/FeaturedProduct";
+import Hero from "@/app/components/Hero";
 
 export default function Home() {
   return (
