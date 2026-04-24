@@ -57,9 +57,10 @@ on all pages.
 
 - I'm pretty sure all the work of getting my API layer clean, and consolidating all the 404 logic into a clean abstraction, was entirely mine. 
 - I devised a pattern to keep error messages from client code. Compare the ApiResponse type to the
-`ServiceResponse` type.
-- The general approach to cart state--trusting local as the source of truth.
-- The approach to error handling. setError(true) worked really cleanly, as best as I can recall.
+`ServiceResponse` type. The idea was this made it harder to accidentally leak error messages to the client.
+- The general approach to cart state--trusting local as the source of truth, and showing in process 
+through total mismatch. (Though I did see an isPending via inequality in one of the React.dev examples.)
+- The approach to error handling and display via the `useState` hook.
 
 ## Thanks
 This was a great exercise, and greatly solidified my knowledge of Vercel, Next.js, TS and JS. Thanks for the chance to take part!
