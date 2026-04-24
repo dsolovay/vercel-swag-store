@@ -1,6 +1,6 @@
 "use client";
 
-import { addProductToCart } from "../lib/server-actions";
+import { addProductToCart } from "@/app/lib/server-actions";
 import { RefreshCw } from "lucide-react";
 import { useFormStatus } from "react-dom";
 import { useEffect } from "react";

@@ -8,8 +8,7 @@
 
 import "server-only";
 import { AvailabilityInfo, ApiResponse, Cart, Product, Pagination, Promotion } from "./types";
-import { cacheLife, cacheTag } from "next/cache";
-import { sign } from "crypto";
+import { cacheLife, cacheTag, revalidateTag } from "next/cache";
 
 // This file wraps all API interactions. It is only called by cart-service-actions.
 // This ensures that error invformation is kept on the server.
@@ -86,8 +85,8 @@ export async function createCart(): Promise<ApiResponse<Cart>> {
   return doFetch(`/cart/create`, {method:"POST"});
 }
 
-export function addToCart(data: { productId: string; quantity: number; cartToken: string }): Promise<ApiResponse<Cart>> {
-  return doFetch('/cart',
+export async function addToCart(data: { productId: string; quantity: number; cartToken: string }): Promise<ApiResponse<Cart>> {
+  const response = await doFetch<Cart>('/cart',
     {
       method: "POST",
       body: JSON.stringify({ "productId": data.productId, "quantity": data.quantity }),
@@ -95,6 +94,8 @@ export function addToCart(data: { productId: string; quantity: number; cartToken
         "x-cart-token": data.cartToken,
       }
     });
+  revalidateTag(`product-stock-${data.productId}`, "max"); // Revalidate stock info when cart is updated, to ensure stock info is up to date.
+  return response;
 }
 
 export async function getCart(cartToken: string): Promise<ApiResponse<Cart>> {
@@ -112,28 +113,30 @@ export async function getCart(cartToken: string): Promise<ApiResponse<Cart>> {
   return getCartResponse;
 }
 
-export function deleteCartLine(data: { productId: string; cartToken: string }): Promise<ApiResponse<Cart>> {
+export async function deleteCartLine(data: { productId: string; cartToken: string }): Promise<ApiResponse<Cart>> {
   if (process.env.SIMULATE_DELETE_ERROR?.toLowerCase() === 'true') 
   {
     return new Promise((resolve) => setTimeout(() => resolve({ success: false, statusCode: 500 }), 2000));
   }
-  return doFetch(`/cart/${data.productId}`,
+  const response = await doFetch<Cart>(`/cart/${data.productId}`,
     {
       method: "DELETE",
       headers: {
         "x-cart-token": data.cartToken,
       }
     });
+  revalidateTag(`product-stock-${data.productId}`, "max");
+  return response;
 }
 
 
-export function updateQuantity(data: { productId: string; quantity: number; cartToken: string }): Promise<ApiResponse<Cart>> {  
+export async function updateQuantity(data: { productId: string; quantity: number; cartToken: string }): Promise<ApiResponse<Cart>> {
   if (process.env.SIMULATE_UPDATE_ERROR?.toLowerCase() === 'true')
   {
     return new Promise((resolve) => setTimeout(() => resolve({ success: false, statusCode: 500 }), 2000));
   }
   
-  return doFetch(`/cart/${data.productId}`,
+  const response = await doFetch<Cart>(`/cart/${data.productId}`,
     {
       method: "PATCH",
       body: JSON.stringify({ "quantity": data.quantity }),
@@ -141,6 +144,8 @@ export function updateQuantity(data: { productId: string; quantity: number; cart
         "x-cart-token": data.cartToken,
       }
     });
+  revalidateTag(`product-stock-${data.productId}`, "max");
+  return response;
 }
 
 
