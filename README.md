@@ -57,7 +57,7 @@ on all pages.
 ## Where I did not use AI
 
 - I'm pretty sure all the work of getting my API layer clean, and consolidating all the 404 logic into a clean abstraction, was entirely mine. 
-- I devised a pattern to keep error messages from client code. Compare the ApiResponse type to the
+- I devised a pattern to keep error messages from client code. Compare the `ApiResponse` type to the
 `ServiceResponse` type. The idea was this made it harder to accidentally leak error messages to the client.
 - The general approach to cart state--trusting local as the source of truth, and showing in process 
 through total mismatch. (Though I did see an isPending via inequality in one of the React.dev examples.)
