@@ -24,7 +24,8 @@ Repo: https://github.com/dsolovay/vercel-swag-store
 - Cart state is shown on a badge with a professional look.
 - Code with access to API keys is marked server-only.
 - Caching is in place with sensible limits.
-- Inventory is looked up when the cart is rendered in a performant way, with Promise.all. It is used to clamp the inventory spinners per line item.
+- Inventory is looked up when the cart is rendered in a performant way, with Promise.all. It is used to clamp the inventory spinners per line item. If a user types, say, 100 in the quantity field, it will
+snap back to the current inventory.
 - Although inventory is random, it is treated as if real, with caching for seconds, and 
 tag invalidation when a product is added or removed from a cart, or its quantity adjusted.
 
