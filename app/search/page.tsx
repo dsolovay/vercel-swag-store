@@ -115,4 +115,3 @@ function SearchGrid({products}: {products: Product[]}) {
     ))}
   </div>;
 }
-

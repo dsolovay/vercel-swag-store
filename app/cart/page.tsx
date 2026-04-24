@@ -28,4 +28,11 @@ export default async function Page() {
   );
 }
 
-
+export const metadata = {
+  title: "Shopping Cart",
+  description: "Quality swag is a click away!",
+  openGraph: {
+    title: "Shopping Cart",
+    description: "Quality swag is a click away!",
+  },
+}

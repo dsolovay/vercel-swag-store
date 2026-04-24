@@ -1,6 +1,7 @@
 import PromoBanner from "./components/promo-banner";
 import FeaturedProducts from "./components/FeaturedProduct";
 import Hero from "@/app/components/Hero";
+import { Metadata } from "next";
 
 export default function Home() {
   
@@ -23,4 +24,13 @@ export default function Home() {
       <FeaturedProducts />
     </div>
   );
+}
+
+export const metadata: Metadata = {
+  title: "Home | Vercel Swag Store", // Template inheritance does not work on the same route segment. 
+  description: "Welcome to the Vercel Swag Store! Discover our exclusive collection of Vercel swag items, from stylish apparel to must-have accessories. Shop now and show off your Vercel pride!",
+  openGraph: {
+    title: "Home",
+    description: "Welcome to the Vercel Swag Store! Discover our exclusive collection of Vercel swag items, from stylish apparel to must-have accessories. Shop now and show off your Vercel pride!",
+  },
 }

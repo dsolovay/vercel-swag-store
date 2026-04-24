@@ -18,10 +18,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const titleTemplate = {
-  default: "Vercel Swag Store",
-  template: "%s | Vercel Swag Store",
-};
 const description = "Vercel Swag Store certification exercise for Dan Solovay";
 
 async function Footer() {
@@ -62,10 +58,13 @@ async function CartQunantityBadge() {
 }
 
 export const metadata: Metadata = {
-  title: titleTemplate,
+  title: {
+    default: "Vercel Swag Store",
+    template: "%s | Vercel Swag Store",
+  },
   description: description,
   openGraph: {
-    title: titleTemplate,
+    title: "Vercel Swag Store",
     description: description,
   },
   metadataBase: process.env.VERCEL_URL
@@ -105,6 +104,12 @@ export default function RootLayout({
               </div>
               {/* Navigation */}
               <nav className="flex gap-6">
+                <Link
+                  href="/"
+                  className="text-sm font-medium text-gray-600 hover:text-gray-900"
+                >
+                  Home
+                </Link>
                 <Link
                   href="/search"
                   className="text-sm font-medium text-gray-600 hover:text-gray-900"
